@@ -1,6 +1,7 @@
 package com.yakirarie.chatapp
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -25,5 +26,17 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    fun loginBtnNavClicked(view: View){
+
+    }
+
+    fun onChannelClicked(view: View){
+
+    }
+
+    fun sendMessageBtnClicked(view: View){
+
     }
 }
