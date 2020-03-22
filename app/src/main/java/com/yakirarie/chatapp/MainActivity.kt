@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
@@ -29,11 +28,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         } else
             logInTextView.text = "connected $uid"
-    }
-
-
-    fun sendMessageBtnClicked(view: View) {
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
