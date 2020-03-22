@@ -26,6 +26,9 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener{
                 Toast.makeText(this, "Success", Toast.LENGTH_SHORT)
                     .show()
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to login: ${it.message}", Toast.LENGTH_SHORT)

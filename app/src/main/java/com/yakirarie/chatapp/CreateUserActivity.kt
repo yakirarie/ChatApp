@@ -89,12 +89,15 @@ class CreateUserActivity : AppCompatActivity() {
 
     private fun saveUserToFirebaseDatabase(profileImageUrl: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
-        val ref = FirebaseFirestore.getInstance().collection("users")
+        val ref = FirebaseFirestore.getInstance().collection("users").document("$uid")
         val user = User(uid, createUserNameText.text.toString(), profileImageUrl)
-        ref.add(user).addOnSuccessListener {
+        ref.set(user).addOnSuccessListener {
             Log.d(TAG, "Successfully saved user to Firestore!")
             Toast.makeText(this, "Successfully saved user to database!", Toast.LENGTH_SHORT)
                 .show()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
 
         }.addOnFailureListener {
             Log.d(TAG, "Failed to save user to Firestore: ${it.message}")
@@ -108,4 +111,3 @@ class CreateUserActivity : AppCompatActivity() {
     }
 }
 
-class User(val uid: String, val username: String, val profileImageUrl: String)
