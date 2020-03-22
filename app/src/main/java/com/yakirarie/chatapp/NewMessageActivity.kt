@@ -1,5 +1,6 @@
 package com.yakirarie.chatapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,10 @@ import kotlinx.android.synthetic.main.activity_new_message.*
 class NewMessageActivity : AppCompatActivity() {
 
     private val TAG = "NewMessageActivityDebug"
+
+    companion object{
+        val USER_KEY = "USER_KEY"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +34,15 @@ class NewMessageActivity : AppCompatActivity() {
                 for (document in result) {
                     val user = document.toObject(User::class.java)
                     adapter.add(UserItem(user))
+                }
+
+                adapter.setOnItemClickListener { item, view ->
+                    val userItem = item as UserItem
+                    val intent = Intent(view.context, ChatLogActivity::class.java)
+                    intent.putExtra(USER_KEY, userItem.user)
+                    startActivity(intent)
+                    finish()
+
                 }
 
                 recyclerViewNewMessage.adapter = adapter
