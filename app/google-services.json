@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "590668138384",
+    "firebase_url": "https://chat-app-5eda4.firebaseio.com",
+    "project_id": "chat-app-5eda4",
+    "storage_bucket": "chat-app-5eda4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590668138384:android:f5bb24d85ca1a879909515",
+        "android_client_info": {
+          "package_name": "com.yakirarie.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "590668138384-8clch1nv3mtb1g3qgvjae6g8i489g0he.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7h9exgO2GD4x6IDHZ-PcJesfgFHso1c8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "590668138384-8clch1nv3mtb1g3qgvjae6g8i489g0he.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
