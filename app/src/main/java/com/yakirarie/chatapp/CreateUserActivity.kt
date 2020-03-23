@@ -3,6 +3,7 @@ package com.yakirarie.chatapp
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -29,21 +30,28 @@ class CreateUserActivity : AppCompatActivity() {
     fun createUserClicked(view: View) {
         val email = createEmailText.text.toString()
         val password = createPasswordText.text.toString()
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please enter text in email/password", Toast.LENGTH_SHORT).show()
+        val username = createUserNameText.text.toString()
+
+        if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
+            Toast.makeText(this, "Please fill all of the above", Toast.LENGTH_SHORT).show()
             return
         }
+        progressBar.visibility = View.VISIBLE
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (!it.isSuccessful) return@addOnCompleteListener
                 Log.d(TAG, "Successfully created user with uid: ${it.result?.user?.uid}")
                 uploadImageToFirebaseStorage()
+
             }
             .addOnFailureListener {
                 Log.d(TAG, "Failed to create user: ${it.message}")
                 Toast.makeText(this, "Failed to create user: ${it.message}", Toast.LENGTH_SHORT)
                     .show()
+                progressBar.visibility = View.GONE
+
             }
+
     }
 
     fun selectPhotoClicked(view: View) {
@@ -67,6 +75,7 @@ class CreateUserActivity : AppCompatActivity() {
         if (selectedPhotoUri == null) {
             Toast.makeText(this, "Please add a profile image", Toast.LENGTH_SHORT)
                 .show()
+            progressBar.visibility = View.GONE
             return
         }
         val filename = UUID.randomUUID().toString()
@@ -83,6 +92,8 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d(TAG, "Failed to upload Image: ${it.message}")
             Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
                 .show()
+            progressBar.visibility = View.GONE
+
         }
 
     }
@@ -93,8 +104,10 @@ class CreateUserActivity : AppCompatActivity() {
         val user = User(uid, createUserNameText.text.toString(), profileImageUrl)
         ref.setValue(user).addOnSuccessListener {
             Log.d(TAG, "Successfully saved user to Firestore!")
-            Toast.makeText(this, "Successfully saved user to database!", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Welcome $", Toast.LENGTH_SHORT)
                 .show()
+            progressBar.visibility = View.GONE
+
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
@@ -107,6 +120,8 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
+            progressBar.visibility = View.GONE
+
         }
     }
 }
