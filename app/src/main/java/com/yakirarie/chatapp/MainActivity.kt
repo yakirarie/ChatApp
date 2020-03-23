@@ -2,21 +2,39 @@ package com.yakirarie.chatapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivityDebug"
+    companion object {
+        var currentUser: User? = null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        fetchCurrentUser()
         verifyUserLoggedIn()
 
+
+    }
+
+    private fun fetchCurrentUser(){
+        val uid = FirebaseAuth.getInstance().uid
+        val ref = FirebaseFirestore.getInstance().collection("users").document("$uid")
+        ref.get().addOnSuccessListener {
+                currentUser = it.toObject(User::class.java)
+                Log.d(TAG,"Current user is ${currentUser?.username}")
+            }
 
     }
 

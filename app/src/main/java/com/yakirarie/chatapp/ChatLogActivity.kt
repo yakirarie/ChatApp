@@ -40,10 +40,10 @@ class ChatLogActivity : AppCompatActivity() {
                         DocumentChange.Type.ADDED -> {
                             val chatMessage = documentChange.document.toObject(ChatMessage::class.java)
                             if (chatMessage.fromId == FirebaseAuth.getInstance().uid){
-                                adapter.add(ChatFromItem(chatMessage.text))
+                                adapter.add(ChatFromItem(chatMessage.text, MainActivity.currentUser!!))
                             }
                             else{
-                                adapter.add(ChatToItem(chatMessage.text))
+                                adapter.add(ChatToItem(chatMessage.text, user))
                             }
                         }
                         DocumentChange.Type.MODIFIED -> {}
