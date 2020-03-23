@@ -104,7 +104,7 @@ class CreateUserActivity : AppCompatActivity() {
         val user = User(uid, createUserNameText.text.toString(), profileImageUrl)
         ref.setValue(user).addOnSuccessListener {
             Log.d(TAG, "Successfully saved user to Firestore!")
-            Toast.makeText(this, "Welcome $", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT)
                 .show()
             progressBar.visibility = View.GONE
 

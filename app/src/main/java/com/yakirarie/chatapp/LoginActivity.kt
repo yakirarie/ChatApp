@@ -19,12 +19,12 @@ class LoginActivity : AppCompatActivity() {
         val email = loginEmailText.text.toString()
         val password = loginPasswordText.text.toString()
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please enter text in email/password", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please fill all of the above", Toast.LENGTH_SHORT).show()
             return
         }
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnCompleteListener{
-                Toast.makeText(this, "Success", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "Welcome Back!", Toast.LENGTH_SHORT)
                     .show()
                 val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
