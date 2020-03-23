@@ -14,24 +14,26 @@ import kotlinx.android.synthetic.main.activity_chat_log.*
 class ChatLogActivity : AppCompatActivity() {
 
     private val TAG = "ChatLogActivityDebug"
-    lateinit var user: User
+    lateinit var toUser: User
     val adapter = GroupAdapter<GroupieViewHolder>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
         recyclerViewChatLog.adapter = adapter
-        user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-        supportActionBar?.title = user.username
+        toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+        supportActionBar?.title = toUser.username
         listenForMessages()
 
     }
 
     private fun listenForMessages(){
-        val ref = FirebaseFirestore.getInstance().collection("messages")
+        val fromId = FirebaseAuth.getInstance().uid
+        val toId = toUser.uid
+        val ref = FirebaseFirestore.getInstance().collection("user-messages/$fromId/$toId")
         ref.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
             if (firebaseFirestoreException != null) {
-                Log.d(TAG, "Listen failed: $firebaseFirestoreException");
+                Log.d(TAG, "Listening failed: $firebaseFirestoreException");
                 return@addSnapshotListener
             }
             if (querySnapshot != null) {
@@ -39,11 +41,11 @@ class ChatLogActivity : AppCompatActivity() {
                     when (documentChange.type){
                         DocumentChange.Type.ADDED -> {
                             val chatMessage = documentChange.document.toObject(ChatMessage::class.java)
-                            if (chatMessage.fromId == FirebaseAuth.getInstance().uid){
+                            if (chatMessage.fromId == fromId){
                                 adapter.add(ChatFromItem(chatMessage.text, MainActivity.currentUser!!))
                             }
                             else{
-                                adapter.add(ChatToItem(chatMessage.text, user))
+                                adapter.add(ChatToItem(chatMessage.text, toUser))
                             }
                         }
                         DocumentChange.Type.MODIFIED -> {}
@@ -61,12 +63,22 @@ class ChatLogActivity : AppCompatActivity() {
     fun sendBtnClicked(view: View) {
         val text = editTextChatLog.text.toString()
         val fromId = FirebaseAuth.getInstance().uid ?: return
-        val toId = user.uid
-        val ref = FirebaseFirestore.getInstance().collection("messages").document()
+        val toId = toUser.uid
+        val ref = FirebaseFirestore.getInstance().collection("user-messages/$fromId/$toId")
+        val toRef = FirebaseFirestore.getInstance().collection("user-messages/$toId/$fromId")
+
+
         val chatMessage = ChatMessage(ref.id, text, fromId, toId, System.currentTimeMillis() / 1000)
-        ref.set(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat message: ${ref.id}")
+        ref.add(chatMessage).addOnSuccessListener {
+            Log.d(TAG, "Saved our chat from-message: ${ref.id}")
+            editTextChatLog.text.clear()
+            recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
         }
+
+        toRef.add(chatMessage).addOnSuccessListener {
+            Log.d(TAG, "Saved our chat to-message: ${toRef.id}")
+        }
+
     }
 
 }
