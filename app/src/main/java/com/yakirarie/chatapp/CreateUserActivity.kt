@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
@@ -89,9 +89,9 @@ class CreateUserActivity : AppCompatActivity() {
 
     private fun saveUserToFirebaseDatabase(profileImageUrl: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
-        val ref = FirebaseFirestore.getInstance().collection("users").document("$uid")
+        val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
         val user = User(uid, createUserNameText.text.toString(), profileImageUrl)
-        ref.set(user).addOnSuccessListener {
+        ref.setValue(user).addOnSuccessListener {
             Log.d(TAG, "Successfully saved user to Firestore!")
             Toast.makeText(this, "Successfully saved user to database!", Toast.LENGTH_SHORT)
                 .show()
