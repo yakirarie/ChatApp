@@ -17,14 +17,16 @@ import kotlinx.android.synthetic.main.activity_chat_log.*
 class ChatLogActivity : AppCompatActivity() {
 
     private val TAG = "ChatLogActivityDebug"
-    lateinit var toUser: User
+    companion object{
+        lateinit var toUser: User
+    }
     val adapter = GroupAdapter<GroupieViewHolder>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
         recyclerViewChatLog.adapter = adapter
-        toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+        toUser = intent.getParcelableExtra(NewMessageActivity.USER_KEY)
         supportActionBar?.title = toUser.username
         listenForMessages()
 

@@ -3,7 +3,6 @@ package com.yakirarie.chatapp
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
-import kotlinx.android.synthetic.main.chat_from_row.view.*
 import kotlinx.android.synthetic.main.chat_to_row.view.*
 
 class ChatToItem(val text: String, val user: User) : Item<GroupieViewHolder>() {

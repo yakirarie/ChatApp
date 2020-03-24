@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
@@ -20,10 +21,12 @@ class CreateUserActivity : AppCompatActivity() {
 
     private val TAG = "CreateUserActivityDebug"
     private var selectedPhotoUri: Uri? = null
+    lateinit var token:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_user)
+        getToken()
     }
 
 
@@ -34,6 +37,11 @@ class CreateUserActivity : AppCompatActivity() {
 
         if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
             Toast.makeText(this, "Please fill all of the above", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (selectedPhotoUri == null) {
+            Toast.makeText(this, "Please add a profile image", Toast.LENGTH_SHORT)
+                .show()
             return
         }
         progressBar.visibility = View.VISIBLE
@@ -72,12 +80,6 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebaseStorage() {
-        if (selectedPhotoUri == null) {
-            Toast.makeText(this, "Please add a profile image", Toast.LENGTH_SHORT)
-                .show()
-            progressBar.visibility = View.GONE
-            return
-        }
         val filename = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
 
@@ -101,7 +103,7 @@ class CreateUserActivity : AppCompatActivity() {
     private fun saveUserToFirebaseDatabase(profileImageUrl: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        val user = User(uid, createUserNameText.text.toString(), profileImageUrl)
+        val user = User(uid, createUserNameText.text.toString(), profileImageUrl, token)
         ref.setValue(user).addOnSuccessListener {
             Log.d(TAG, "Successfully saved user to Firestore!")
             Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT)
@@ -124,5 +126,13 @@ class CreateUserActivity : AppCompatActivity() {
 
         }
     }
+
+    private fun getToken(){
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            token = it.token;
+            Log.d("newToken",token)
+        }
+    }
+
 }
 

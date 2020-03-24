@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "590668138384-avi7uee2g1lgbrjsfnbir9spc0bluuev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yakirarie.chatapp",
+            "certificate_hash": "a5e56d27dedb3b07c9074667ed7548ff20040af7"
+          }
+        },
+        {
           "client_id": "590668138384-8clch1nv3mtb1g3qgvjae6g8i489g0he.apps.googleusercontent.com",
           "client_type": 3
         }
