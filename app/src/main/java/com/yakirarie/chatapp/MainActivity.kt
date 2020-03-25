@@ -37,11 +37,22 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
             startActivity(intent)
         }
+
         listenForLatestMessages()
         fetchCurrentUser()
         verifyUserLoggedIn()
+        recievedNotification()
 
 
+    }
+
+    private fun recievedNotification(){
+        val toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+        if (toUser != null){
+            val intent = Intent(this, ChatLogActivity::class.java)
+            intent.putExtra(NewMessageActivity.USER_KEY, toUser)
+            startActivity(intent)
+        }
     }
 
     private fun listenForLatestMessages() {

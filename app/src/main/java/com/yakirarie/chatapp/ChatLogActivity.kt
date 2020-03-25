@@ -70,9 +70,13 @@ class ChatLogActivity : AppCompatActivity() {
 
 
     fun sendBtnClicked(view: View) {
+
         val text = editTextChatLog.text.toString()
+        if (text.isEmpty()) return
+
         val fromId = FirebaseAuth.getInstance().uid ?: return
         val toId = toUser.uid
+
 
         val ref =
             FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()

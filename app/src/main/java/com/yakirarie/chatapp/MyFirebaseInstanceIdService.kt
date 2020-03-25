@@ -9,16 +9,11 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat.Builder
 import androidx.core.content.ContextCompat
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 
 class MyFirebaseInstanceIdService : FirebaseMessagingService() {
-
     companion object {
         var senderUser: User? = null
     }
@@ -29,7 +24,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         val params = remoteMessage.data
-       senderUser = User(params["sender_id"]!!, params["sender_username"]!!, params["sender_img"]!!, params["sender_token"]!!)
+        senderUser = User(params["sender_id"]!!, params["sender_username"]!!, params["sender_img"]!!, params["sender_token"]!!)
         val NOTIFICATION_CHANNEL_ID = "channel"
         val pattern = longArrayOf(0, 1000, 500, 1000)
         val mNotificationManager =
@@ -67,18 +62,10 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
         }
 
 
-        val resultIntent = Intent(this, ChatLogActivity::class.java)
+        val resultIntent = Intent(this, MainActivity::class.java)
+        resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
         resultIntent.putExtra(NewMessageActivity.USER_KEY, senderUser)
-        val resultPendingIntent: PendingIntent
-        if (currentActivity == ".ChatLogActivity") {
-            resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            resultPendingIntent =
-                PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT)
-        } else {
-            resultPendingIntent =
-                PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-
+        val resultPendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val notificationBuilder: Builder = Builder(this, NOTIFICATION_CHANNEL_ID)
 
