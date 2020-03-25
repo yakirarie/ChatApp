@@ -44,7 +44,7 @@
         android:background="@drawable/rounded_button"
         android:onClick="loginLoginBtnClicked"
         android:text="Login"
-        android:textColor="@android:color/white"
+        android:textColor="#29323c"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginPasswordText" />
@@ -71,7 +71,7 @@
         android:background="@drawable/rounded_button"
         android:onClick="loginCreateUserBtnClicked"
         android:text="Sign Up Here"
-        android:textColor="@android:color/white"
+        android:textColor="#29323c"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />

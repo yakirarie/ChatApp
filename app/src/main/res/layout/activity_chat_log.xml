@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/colorAccent"
     tools:context=".ChatLogActivity">
 
     <EditText
@@ -13,11 +13,12 @@
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@android:color/white"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_textview"
         android:ems="10"
         android:hint="Enter Message"
         android:inputType="textMultiLine"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sendBtnChatLog"
         app:layout_constraintStart_toStartOf="parent" />
@@ -27,11 +28,11 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_button"
-        android:text="Send"
         android:onClick="sendBtnClicked"
-        android:textColor="@android:color/white"
+        android:text="Send"
+        android:textColor="#29323c"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -40,12 +41,13 @@
         android:id="@+id/recyclerViewChatLog"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_marginBottom="16dp"
-        android:background="@color/colorAccent"
+        android:background="@drawable/gradient_background"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/editTextChatLog"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
