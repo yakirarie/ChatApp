@@ -89,8 +89,6 @@ class MyProfileActivity : AppCompatActivity() {
             )
                 .show()
             progressBarMyProfile.visibility = View.GONE
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
             finish()
 
         }.addOnFailureListener {
@@ -119,7 +117,7 @@ class MyProfileActivity : AppCompatActivity() {
     }
 
     private fun deleteOldProfileImage() {
-        val imageLocation = exctractFilenamFromUrl()
+        val imageLocation = extractFilenameFromUrl()
         val oldRef =
             FirebaseStorage.getInstance().getReference("/images/$imageLocation")
         oldRef.delete().addOnSuccessListener {
@@ -134,7 +132,7 @@ class MyProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun exctractFilenamFromUrl(): String {
+    private fun extractFilenameFromUrl(): String {
         return currentUser.profileImageUrl.substringAfter("%2F").substringBefore("?alt=")
 
     }
