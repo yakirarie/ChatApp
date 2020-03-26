@@ -3,7 +3,6 @@ package com.yakirarie.chatapp
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -33,7 +32,7 @@ class CreateUserActivity : AppCompatActivity() {
     fun createUserClicked(view: View) {
         val email = createEmailText.text.toString()
         val password = createPasswordText.text.toString()
-        val username = createUserNameText.text.toString()
+        val username = usernameMyProfile.text.toString()
 
         if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
             Toast.makeText(this, "Please fill all of the above", Toast.LENGTH_SHORT).show()
@@ -73,7 +72,7 @@ class CreateUserActivity : AppCompatActivity() {
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-            profileCircleImageView.setImageBitmap(bitmap)
+            changeProfileMyProfile.setImageBitmap(bitmap)
             defaultProfileImageView.alpha = 0f
 
         }
@@ -103,7 +102,7 @@ class CreateUserActivity : AppCompatActivity() {
     private fun saveUserToFirebaseDatabase(profileImageUrl: String) {
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        val user = User(uid, createUserNameText.text.toString(), profileImageUrl, token)
+        val user = User(uid, usernameMyProfile.text.toString(), profileImageUrl, token)
         ref.setValue(user).addOnSuccessListener {
             Log.d(TAG, "Successfully saved user to Firestore!")
             Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT)

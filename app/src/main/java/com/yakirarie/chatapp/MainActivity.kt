@@ -20,7 +20,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var currentUser: User? = null
+        val CURRENT_USER = "CURRENT_USER"
+
     }
+
 
     val adapter = GroupAdapter<GroupieViewHolder>()
     val latestMessagesMap = HashMap<String, ChatMessage>()
@@ -46,12 +49,18 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        fetchCurrentUser()
+
+    }
+
     private fun receivedNotification(){
         val toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
 
         if (toUser != null){  // my notification
             if (currentUser == null) {
-                currentUser = intent.getParcelableExtra("CURRENT_USER")
+                currentUser = intent.getParcelableExtra(CURRENT_USER)
 
             }
             Log.d("USER", toUser.toString())
@@ -163,12 +172,17 @@ class MainActivity : AppCompatActivity() {
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }
+            R.id.menu_user_profile -> {
+                val intent = Intent(this, MyProfileActivity::class.java)
+                startActivity(intent)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.nav_menu, menu)
+
         return super.onCreateOptionsMenu(menu)
     }
 }

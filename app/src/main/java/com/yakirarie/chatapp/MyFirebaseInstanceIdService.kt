@@ -73,7 +73,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
         val resultIntent = Intent(this, MainActivity::class.java)
         resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
         resultIntent.putExtra(NewMessageActivity.USER_KEY, senderUser)
-        resultIntent.putExtra("CURRENT_USER", currentUser)
+        resultIntent.putExtra(MainActivity.CURRENT_USER, currentUser)
         val resultPendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val notificationBuilder: Builder = Builder(this, NOTIFICATION_CHANNEL_ID)

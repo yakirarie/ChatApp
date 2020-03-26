@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CreateUserActivity">
+    tools:context=".MyProfileActivity">
 
     <Button
         android:id="@+id/createUserBtn"
@@ -14,8 +14,8 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="4dp"
         android:background="@drawable/rounded_button"
-        android:onClick="createUserClicked"
-        android:text="Create User"
+        android:onClick="saveChangesClicked"
+        android:text="Save Changes"
         android:textColor="#29323c"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,66 +30,23 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:ems="10"
-        android:hint="user name"
+        android:hint=""
         android:inputType="textPersonName"
         android:textColor="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/createEmailText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:ems="10"
-        android:hint="email"
-        android:inputType="textPersonName"
-        android:textColor="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameMyProfile" />
-
-    <EditText
-        android:id="@+id/createPasswordText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:ems="10"
-        android:hint="password"
-        android:inputType="textPassword"
-        android:textColor="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createEmailText" />
-
-    <ImageView
-        android:id="@+id/defaultProfileImageView"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createPasswordText"
-        app:srcCompat="@drawable/profiledefault" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/changeProfileMyProfile"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_marginTop="16dp"
         app:civ_border_width="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/defaultProfileImageView"
-        app:layout_constraintEnd_toEndOf="@+id/defaultProfileImageView"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/defaultProfileImageView"
-        app:layout_constraintTop_toTopOf="@+id/defaultProfileImageView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameMyProfile" />
 
     <Button
         android:id="@+id/selectPhotoBtn"
@@ -99,22 +56,23 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         android:background="@drawable/rounded_button"
-        android:onClick="selectPhotoClicked"
-        android:text="Upload Photo"
+        android:onClick="changePhotoClicked"
+        android:text="Change Photo"
         android:textColor="#29323c"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/defaultProfileImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/changeProfileMyProfile" />
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/progressBarMyProfile"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/createUserBtn"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/selectPhotoBtn" />
 
