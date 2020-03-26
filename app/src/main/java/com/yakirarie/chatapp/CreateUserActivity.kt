@@ -20,12 +20,10 @@ class CreateUserActivity : AppCompatActivity() {
 
     private val TAG = "CreateUserActivityDebug"
     private var selectedPhotoUri: Uri? = null
-    lateinit var token:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_user)
-        getToken()
     }
 
 
@@ -86,7 +84,7 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
             ref.downloadUrl.addOnSuccessListener {
                 Log.d(TAG, "File location: $it")
-                saveUserToFirebaseDatabase(it.toString())
+                getToken(it.toString())
 
             }
         }.addOnFailureListener {
@@ -99,7 +97,27 @@ class CreateUserActivity : AppCompatActivity() {
 
     }
 
-    private fun saveUserToFirebaseDatabase(profileImageUrl: String) {
+    private fun getToken(profileImageUrl: String) {
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            saveUserToFirebaseDataBase(profileImageUrl, it.token)
+        }.addOnFailureListener {
+            Log.d(TAG, "Unable to get token: ${it.message}")
+            Toast.makeText(
+                this,
+                "Unable to get token: ${it.message}",
+                Toast.LENGTH_SHORT
+            )
+                .show()
+            progressBar.visibility = View.GONE
+
+        }
+
+    }
+
+
+    private fun saveUserToFirebaseDataBase(profileImageUrl: String, token:String){
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
         val user = User(uid, usernameMyProfile.text.toString(), profileImageUrl, token)
@@ -126,12 +144,7 @@ class CreateUserActivity : AppCompatActivity() {
         }
     }
 
-    private fun getToken(){
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-            token = it.token;
-            Log.d("newToken",token)
-        }
-    }
+
 
 }
 
