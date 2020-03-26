@@ -16,15 +16,23 @@ import com.google.firebase.messaging.RemoteMessage
 class MyFirebaseInstanceIdService : FirebaseMessagingService() {
     companion object {
         var senderUser: User? = null
+        var currentUser: User? =null
     }
 
     override fun onNewToken(s: String) {
         Log.e("NEW_TOKEN", s)
     }
 
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        Log.d("TAG", remoteMessage.notification.toString())
         val params = remoteMessage.data
+        Log.d("TAG", params.toString())
+
         senderUser = User(params["sender_id"]!!, params["sender_username"]!!, params["sender_img"]!!, params["sender_token"]!!)
+        currentUser = User(params["receiver_id"]!!, params["receiver_username"]!!, params["receiver_img"]!!, params["receiver_token"]!!)
+        Log.d("PARAMS", currentUser?.username ?: "kaki")
+
         val NOTIFICATION_CHANNEL_ID = "channel"
         val pattern = longArrayOf(0, 1000, 500, 1000)
         val mNotificationManager =
@@ -65,14 +73,15 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
         val resultIntent = Intent(this, MainActivity::class.java)
         resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
         resultIntent.putExtra(NewMessageActivity.USER_KEY, senderUser)
+        resultIntent.putExtra("CURRENT_USER", currentUser)
         val resultPendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val notificationBuilder: Builder = Builder(this, NOTIFICATION_CHANNEL_ID)
 
         notificationBuilder.setAutoCancel(true)
             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-            .setContentTitle(params["title"])
-            .setContentText(params["message"])
+            .setContentTitle(remoteMessage.notification?.title)
+            .setContentText(remoteMessage.notification?.body)
             .setDefaults(Notification.DEFAULT_ALL)
             .setWhen(System.currentTimeMillis())
             .setSmallIcon(R.mipmap.ic_launcher)

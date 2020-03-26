@@ -41,17 +41,50 @@ class MainActivity : AppCompatActivity() {
         listenForLatestMessages()
         fetchCurrentUser()
         verifyUserLoggedIn()
-        recievedNotification()
+        receivedNotification()
 
 
     }
 
-    private fun recievedNotification(){
+    private fun receivedNotification(){
         val toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-        if (toUser != null){
+
+        if (toUser != null){  // my notification
+            if (currentUser == null) {
+                currentUser = intent.getParcelableExtra("CURRENT_USER")
+
+            }
+            Log.d("USER", toUser.toString())
+
             val intent = Intent(this, ChatLogActivity::class.java)
             intent.putExtra(NewMessageActivity.USER_KEY, toUser)
             startActivity(intent)
+        }
+        else { // firebase notification
+            val senderId = intent.getStringExtra("sender_id")
+            val senderUsername = intent.getStringExtra("sender_username")
+            val senderImg = intent.getStringExtra("sender_img")
+            val senderToken = intent.getStringExtra("sender_token")
+
+            val receiverId = intent.getStringExtra("receiver_id")
+            val receiverUsername = intent.getStringExtra("receiver_username")
+            val receiverImg = intent.getStringExtra("receiver_img")
+            val receiverToken = intent.getStringExtra("receiver_token")
+
+            if (receiverId != null && receiverUsername != null && receiverImg != null && receiverToken != null)
+                currentUser = User(receiverId, receiverUsername, receiverImg, receiverToken)
+
+            if (senderId != null && senderUsername != null && senderImg != null && senderToken != null){
+                val user = User(senderId, senderUsername, senderImg, senderToken)
+
+                val intent = Intent(this, ChatLogActivity::class.java)
+                intent.putExtra(NewMessageActivity.USER_KEY, user)
+
+
+                startActivity(intent)
+            }
+
+
         }
     }
 
