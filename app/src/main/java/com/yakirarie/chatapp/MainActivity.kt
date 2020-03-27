@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.iid.FirebaseInstanceId
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -40,10 +42,9 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
             startActivity(intent)
         }
-
         listenForLatestMessages()
-        fetchCurrentUser()
         verifyUserLoggedIn()
+        fetchCurrentUser()
         receivedNotification()
 
 
@@ -53,6 +54,30 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         verifyUserLoggedIn()
         fetchCurrentUser()
+
+    }
+
+    private fun checkIfTokenHasChanged() {
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            Log.d(TAG, " token: ${it.token}")
+            if (currentUser!!.token !=it.token){
+                val ref = FirebaseDatabase.getInstance().getReference("users/${currentUser!!.uid}")
+                ref.child("token").setValue(it.token).addOnSuccessListener {
+                    Log.d(TAG, "Token updated successfully!")
+                }.addOnFailureListener {
+                    Log.e(TAG, "Unable to update token: ${it.message}")
+                }
+            }
+        }.addOnFailureListener {
+            Log.e(TAG, "Unable to get token: ${it.message}")
+            Toast.makeText(
+                this,
+                "Unable to get token: ${it.message}",
+                Toast.LENGTH_SHORT
+            )
+                .show()
+
+        }
 
     }
 
@@ -145,6 +170,7 @@ class MainActivity : AppCompatActivity() {
                 currentUser = p0.getValue(User::class.java)
                 supportActionBar?.title = currentUser?.username
                 Log.d(TAG, "current user is ${currentUser?.username}")
+                checkIfTokenHasChanged()
 
             }
 

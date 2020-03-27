@@ -1,6 +1,9 @@
 package com.yakirarie.chatapp
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -17,10 +20,13 @@ import kotlinx.android.synthetic.main.activity_chat_log.*
 class ChatLogActivity : AppCompatActivity() {
 
     private val TAG = "ChatLogActivityDebug"
-    companion object{
+
+    companion object {
         lateinit var toUser: User
     }
+
     val adapter = GroupAdapter<GroupieViewHolder>()
+    var player: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +34,41 @@ class ChatLogActivity : AppCompatActivity() {
         recyclerViewChatLog.adapter = adapter
         toUser = intent.getParcelableExtra(NewMessageActivity.USER_KEY)
         supportActionBar?.title = toUser.username
-        listenForMessages()
 
+        listenForMessages()
+    }
+
+    private fun playMessageSound() {
+        if (player == null) {
+            player = MediaPlayer.create(applicationContext, R.raw.notification_sound)
+            player!!.setOnCompletionListener {
+                stopMessageSound()
+
+            }
+        }
+        player!!.start()
+    }
+
+    private fun pauseMessageSound() {
+        if (player != null)
+            player!!.pause()
+    }
+
+    private fun stopMessageSound() {
+        if (player != null) {
+            player!!.stop()
+            player!!.release()
+            player = null
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopMessageSound()
     }
 
     private fun listenForMessages() {
+        Log.d(TAG, MainActivity.currentUser!!.token)
         val fromId = FirebaseAuth.getInstance().uid
         val toId = toUser.uid
         val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
@@ -54,6 +90,8 @@ class ChatLogActivity : AppCompatActivity() {
                         adapter.add(ChatFromItem(chatMessage.text, MainActivity.currentUser!!))
                     } else {
                         adapter.add(ChatToItem(chatMessage.text, toUser))
+                        playMessageSound()
+
                     }
                 }
 
@@ -87,7 +125,8 @@ class ChatLogActivity : AppCompatActivity() {
         val latestMessagesToRef =
             FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
 
-        val chatMessage = ChatMessage(ref.key!!, text, fromId, toId, System.currentTimeMillis() / 1000)
+        val chatMessage =
+            ChatMessage(ref.key!!, text, fromId, toId, System.currentTimeMillis() / 1000)
 
         ref.setValue(chatMessage).addOnSuccessListener {
             Log.d(TAG, "Saved our chat from-message: ${ref.key}")
