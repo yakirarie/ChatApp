@@ -5,17 +5,17 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_my_profile.*
 import kotlinx.android.synthetic.main.activity_my_profile.changeProfileMyProfile
 import kotlinx.android.synthetic.main.activity_my_profile.usernameMyProfile
@@ -43,7 +43,8 @@ class MyProfileActivity : AppCompatActivity() {
             override fun onDataChange(p0: DataSnapshot) {
                 currentUser = p0.getValue(User::class.java)!!
                 usernameMyProfile.setText(currentUser.username)
-                Picasso.get().load(currentUser.profileImageUrl).into(changeProfileMyProfile)
+                Glide.with(applicationContext).load(currentUser.profileImageUrl).diskCacheStrategy(
+                    DiskCacheStrategy.ALL).into(changeProfileMyProfile)
 
             }
 
@@ -110,8 +111,8 @@ class MyProfileActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-            changeProfileMyProfile.setImageBitmap(bitmap)
+            Glide.with(applicationContext).load(selectedPhotoUri).diskCacheStrategy(
+                DiskCacheStrategy.ALL).into(changeProfileMyProfile)
 
         }
     }
