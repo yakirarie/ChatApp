@@ -24,6 +24,8 @@ class CreateUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_user)
+        supportActionBar?.title = "Create User"
+
     }
 
 
@@ -41,7 +43,7 @@ class CreateUserActivity : AppCompatActivity() {
                 .show()
             return
         }
-        progressBar.visibility = View.VISIBLE
+        progressBarCreateUser.visibility = View.VISIBLE
         selectPhotoBtn.isClickable = false
         createUserBtn.isClickable = false
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
@@ -55,7 +57,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Log.d(TAG, "Failed to create user: ${it.message}")
                 Toast.makeText(this, "Failed to create user: ${it.message}", Toast.LENGTH_SHORT)
                     .show()
-                progressBar.visibility = View.GONE
+                progressBarCreateUser.visibility = View.GONE
                 selectPhotoBtn.isClickable = true
                 createUserBtn.isClickable = true
 
@@ -95,7 +97,7 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d(TAG, "Failed to upload Image: ${it.message}")
             Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
                 .show()
-            progressBar.visibility = View.GONE
+            progressBarCreateUser.visibility = View.GONE
             selectPhotoBtn.isClickable = true
             createUserBtn.isClickable = true
 
@@ -116,7 +118,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            progressBar.visibility = View.GONE
+            progressBarCreateUser.visibility = View.GONE
             selectPhotoBtn.isClickable = true
             createUserBtn.isClickable = true
 
@@ -133,7 +135,7 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d(TAG, "Successfully saved user to Firestore!")
             Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT)
                 .show()
-            progressBar.visibility = View.GONE
+            progressBarCreateUser.visibility = View.GONE
 
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -147,7 +149,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            progressBar.visibility = View.GONE
+            progressBarCreateUser.visibility = View.GONE
             selectPhotoBtn.isClickable = true
             createUserBtn.isClickable = true
 
