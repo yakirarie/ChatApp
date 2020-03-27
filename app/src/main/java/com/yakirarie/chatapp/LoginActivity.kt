@@ -23,9 +23,7 @@ class LoginActivity : AppCompatActivity() {
             Toast.makeText(this, "Please fill all of the above", Toast.LENGTH_SHORT).show()
             return
         }
-        progressBarLogin.visibility = View.VISIBLE
-        loginLoginBtn.isClickable = false
-        loginCreateUserBtn.isClickable = false
+        freezeGui(true)
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnSuccessListener{
                 Toast.makeText(this, "Welcome Back!", Toast.LENGTH_SHORT)
@@ -33,19 +31,29 @@ class LoginActivity : AppCompatActivity() {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
-                progressBarLogin.visibility = View.GONE
-                loginLoginBtn.isClickable = true
-                loginCreateUserBtn.isClickable = true
+                freezeGui(false)
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to login: ${it.message}", Toast.LENGTH_SHORT)
                     .show()
-                progressBarLogin.visibility = View.GONE
-                loginLoginBtn.isClickable = true
-                loginCreateUserBtn.isClickable = true
+                freezeGui(false)
             }
 
     }
+
+    private fun freezeGui(toFreeze: Boolean){
+        if (toFreeze){
+            progressBarLogin.visibility = View.VISIBLE
+            loginLoginBtn.isClickable = false
+            loginCreateUserBtn.isClickable = false
+        }
+        else{
+            progressBarLogin.visibility = View.GONE
+            loginLoginBtn.isClickable = true
+            loginCreateUserBtn.isClickable = true
+        }
+    }
+
 
     fun loginCreateUserBtnClicked(view: View) {
         val createUserIntent = Intent(this, CreateUserActivity::class.java)

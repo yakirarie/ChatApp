@@ -76,12 +76,29 @@ class MyProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT).show()
             return
         }
-        progressBarMyProfile.visibility = View.VISIBLE
+        freezeGui(true)
         if (selectedPhotoUri != null)
             deleteOldProfileImage()
         else {
             updateUser(currentUser!!.profileImageUrl)
         }
+
+    }
+
+    private fun freezeGui(toFreeze: Boolean){
+        if (toFreeze){
+            progressBarMyProfile.visibility = View.VISIBLE
+            createUserBtn.isClickable = false
+            selectPhotoBtn.isClickable = false
+            deleteAccountBtn.isClickable = false
+        }
+        else{
+            progressBarMyProfile.visibility = View.GONE
+            createUserBtn.isClickable = true
+            selectPhotoBtn.isClickable = true
+            deleteAccountBtn.isClickable = true
+        }
+
 
     }
 
@@ -102,7 +119,7 @@ class MyProfileActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            progressBarMyProfile.visibility = View.GONE
+            freezeGui(false)
             finish()
 
         }.addOnFailureListener {
@@ -114,7 +131,7 @@ class MyProfileActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            progressBarMyProfile.visibility = View.GONE
+            freezeGui(false)
 
         }
     }
@@ -140,7 +157,7 @@ class MyProfileActivity : AppCompatActivity() {
             uploadImageToFirebaseStorage()
         }.addOnFailureListener {
             Log.d(TAG, "Failed to delete old image")
-            progressBarMyProfile.visibility = View.GONE
+            freezeGui(false)
 
         }
 
@@ -165,7 +182,7 @@ class MyProfileActivity : AppCompatActivity() {
             Log.d(TAG, "Failed to upload Image: ${it.message}")
             Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
                 .show()
-            progressBarMyProfile.visibility = View.GONE
+            freezeGui(false)
 
         }
     }

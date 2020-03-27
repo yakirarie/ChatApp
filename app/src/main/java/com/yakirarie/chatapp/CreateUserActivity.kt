@@ -43,9 +43,7 @@ class CreateUserActivity : AppCompatActivity() {
                 .show()
             return
         }
-        progressBarCreateUser.visibility = View.VISIBLE
-        selectPhotoBtn.isClickable = false
-        createUserBtn.isClickable = false
+        freezeGui(true)
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (!it.isSuccessful) return@addOnCompleteListener
@@ -57,9 +55,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Log.d(TAG, "Failed to create user: ${it.message}")
                 Toast.makeText(this, "Failed to create user: ${it.message}", Toast.LENGTH_SHORT)
                     .show()
-                progressBarCreateUser.visibility = View.GONE
-                selectPhotoBtn.isClickable = true
-                createUserBtn.isClickable = true
+                freezeGui(false)
 
             }
 
@@ -82,6 +78,21 @@ class CreateUserActivity : AppCompatActivity() {
         }
     }
 
+    private fun freezeGui(toFreeze: Boolean){
+        if (toFreeze){
+            progressBarCreateUser.visibility = View.VISIBLE
+            selectPhotoBtn.isClickable = false
+            createUserBtn.isClickable = false
+        }
+        else{
+            progressBarCreateUser.visibility = View.GONE
+            selectPhotoBtn.isClickable = true
+            createUserBtn.isClickable = true
+        }
+
+
+    }
+
     private fun uploadImageToFirebaseStorage() {
         val filename = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
@@ -97,9 +108,7 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d(TAG, "Failed to upload Image: ${it.message}")
             Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
                 .show()
-            progressBarCreateUser.visibility = View.GONE
-            selectPhotoBtn.isClickable = true
-            createUserBtn.isClickable = true
+            freezeGui(false)
 
         }
 
@@ -118,9 +127,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            progressBarCreateUser.visibility = View.GONE
-            selectPhotoBtn.isClickable = true
-            createUserBtn.isClickable = true
+            freezeGui(false)
 
         }
 
@@ -135,7 +142,7 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d(TAG, "Successfully saved user to Firestore!")
             Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT)
                 .show()
-            progressBarCreateUser.visibility = View.GONE
+            freezeGui(false)
 
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -149,9 +156,8 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            progressBarCreateUser.visibility = View.GONE
-            selectPhotoBtn.isClickable = true
-            createUserBtn.isClickable = true
+            freezeGui(false)
+
 
         }
     }
