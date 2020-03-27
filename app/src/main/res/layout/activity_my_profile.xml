@@ -64,6 +64,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/changeProfileMyProfile" />
 
+    <Button
+        android:id="@+id/deleteAccountBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/rounded_delete"
+        android:onClick="deleteAccountClicked"
+        android:text="Delete Account"
+        android:textColor="#29323c"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectPhotoBtn" />
+
     <ProgressBar
         android:id="@+id/progressBarMyProfile"
         style="?android:attr/progressBarStyle"
@@ -74,6 +89,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/selectPhotoBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/deleteAccountBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

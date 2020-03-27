@@ -24,12 +24,13 @@ import java.util.*
 class MyProfileActivity : AppCompatActivity() {
 
     private val TAG = "MyProfileActivityDebug"
-    lateinit var currentUser: User
+    private var currentUser: User? = null
     private var selectedPhotoUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_profile)
+        supportActionBar?.title = "My Profile"
         fetchCurrentUser()
     }
 
@@ -42,14 +43,24 @@ class MyProfileActivity : AppCompatActivity() {
 
             override fun onDataChange(p0: DataSnapshot) {
                 currentUser = p0.getValue(User::class.java)!!
-                usernameMyProfile.setText(currentUser.username)
-                Glide.with(applicationContext).load(currentUser.profileImageUrl).diskCacheStrategy(
-                    DiskCacheStrategy.ALL).into(changeProfileMyProfile)
+                usernameMyProfile.setText(currentUser!!.username)
+                Glide.with(applicationContext).load(currentUser!!.profileImageUrl).diskCacheStrategy(
+                    DiskCacheStrategy.ALL
+                ).into(changeProfileMyProfile)
 
             }
 
         })
 
+    }
+
+    fun deleteAccountClicked(view: View) {
+        if (currentUser == null) return
+        val bundle = Bundle()
+        bundle.putParcelable("USER_TO_DELETE", currentUser)
+        val customDialog = CustomDialog()
+        customDialog.arguments = bundle
+        customDialog.show(supportFragmentManager, "custom dialog")
     }
 
     fun changePhotoClicked(view: View) {
@@ -59,6 +70,8 @@ class MyProfileActivity : AppCompatActivity() {
     }
 
     fun saveChangesClicked(view: View) {
+        if (currentUser == null) return
+
         if (usernameMyProfile.text.isEmpty()) {
             Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT).show()
             return
@@ -66,8 +79,8 @@ class MyProfileActivity : AppCompatActivity() {
         progressBarMyProfile.visibility = View.VISIBLE
         if (selectedPhotoUri != null)
             deleteOldProfileImage()
-        else{
-            updateUser(currentUser.profileImageUrl)
+        else {
+            updateUser(currentUser!!.profileImageUrl)
         }
 
     }
@@ -75,12 +88,12 @@ class MyProfileActivity : AppCompatActivity() {
     private fun updateUser(profileImageUrl: String) {
 
         val updatedUser = User(
-            currentUser.uid,
+            currentUser!!.uid,
             usernameMyProfile.text.toString(),
             profileImageUrl,
-            currentUser.token
+            currentUser!!.token
         )
-        val ref = FirebaseDatabase.getInstance().getReference("users/${currentUser.uid}")
+        val ref = FirebaseDatabase.getInstance().getReference("users/${currentUser!!.uid}")
         ref.setValue(updatedUser).addOnSuccessListener {
             Log.d(TAG, "username changed")
             Toast.makeText(
@@ -112,7 +125,8 @@ class MyProfileActivity : AppCompatActivity() {
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
             Glide.with(applicationContext).load(selectedPhotoUri).diskCacheStrategy(
-                DiskCacheStrategy.ALL).into(changeProfileMyProfile)
+                DiskCacheStrategy.ALL
+            ).into(changeProfileMyProfile)
 
         }
     }
@@ -134,7 +148,7 @@ class MyProfileActivity : AppCompatActivity() {
     }
 
     private fun extractFilenameFromUrl(): String {
-        return currentUser.profileImageUrl.substringAfter("%2F").substringBefore("?alt=")
+        return currentUser!!.profileImageUrl.substringAfter("%2F").substringBefore("?alt=")
 
     }
 

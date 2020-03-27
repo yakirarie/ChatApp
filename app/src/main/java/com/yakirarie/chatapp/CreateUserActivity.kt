@@ -42,6 +42,8 @@ class CreateUserActivity : AppCompatActivity() {
             return
         }
         progressBar.visibility = View.VISIBLE
+        selectPhotoBtn.isClickable = false
+        createUserBtn.isClickable = false
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (!it.isSuccessful) return@addOnCompleteListener
@@ -54,6 +56,8 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to create user: ${it.message}", Toast.LENGTH_SHORT)
                     .show()
                 progressBar.visibility = View.GONE
+                selectPhotoBtn.isClickable = true
+                createUserBtn.isClickable = true
 
             }
 
@@ -92,6 +96,8 @@ class CreateUserActivity : AppCompatActivity() {
             Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
                 .show()
             progressBar.visibility = View.GONE
+            selectPhotoBtn.isClickable = true
+            createUserBtn.isClickable = true
 
         }
 
@@ -111,6 +117,8 @@ class CreateUserActivity : AppCompatActivity() {
             )
                 .show()
             progressBar.visibility = View.GONE
+            selectPhotoBtn.isClickable = true
+            createUserBtn.isClickable = true
 
         }
 
@@ -140,6 +148,8 @@ class CreateUserActivity : AppCompatActivity() {
             )
                 .show()
             progressBar.visibility = View.GONE
+            selectPhotoBtn.isClickable = true
+            createUserBtn.isClickable = true
 
         }
     }
