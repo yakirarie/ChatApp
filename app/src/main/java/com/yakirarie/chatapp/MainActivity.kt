@@ -35,12 +35,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar?.title = ""
         recyclerViewLatestMessages.adapter = adapter
-        recyclerViewLatestMessages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        adapter.setOnItemClickListener{ item, view ->
+        recyclerViewLatestMessages.addItemDecoration(
+            DividerItemDecoration(
+                this,
+                DividerItemDecoration.VERTICAL
+            )
+        )
+        adapter.setOnItemClickListener { item, view ->
             val intent = Intent(this, ChatLogActivity::class.java)
             val row = item as LatestMessageRow
-            intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
-            startActivity(intent)
+            if (row.chatPartnerUser == null)
+                removeMessageFromDeletedUser(row.chatMessage.fromId)
+            else {
+                intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
+                startActivity(intent)
+            }
         }
         listenForLatestMessages()
         verifyUserLoggedIn()
@@ -57,10 +66,25 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun removeMessageFromDeletedUser(deletedId: String) {
+        val uid = FirebaseAuth.getInstance().uid
+        val ref = FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
+        ref.removeValue().addOnSuccessListener {
+            Log.d(TAG, "user $deletedId deleted from your latest messages")
+            Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
+
+        }.addOnFailureListener {
+
+            Log.e(TAG, "Failed to delete user-messages : ${it.message}")
+
+        }
+
+    }
+
     private fun checkIfTokenHasChanged() {
         FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
             Log.d(TAG, " token: ${it.token}")
-            if (currentUser!!.token !=it.token){
+            if (currentUser!!.token != it.token) {
                 val ref = FirebaseDatabase.getInstance().getReference("users/${currentUser!!.uid}")
                 ref.child("token").setValue(it.token).addOnSuccessListener {
                     Log.d(TAG, "Token updated successfully!")
@@ -81,10 +105,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun receivedNotification(){
+    private fun receivedNotification() {
         val toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
 
-        if (toUser != null){  // my notification
+        if (toUser != null) {  // my notification
             if (currentUser == null) {
                 currentUser = intent.getParcelableExtra(CURRENT_USER)
 
@@ -94,8 +118,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, ChatLogActivity::class.java)
             intent.putExtra(NewMessageActivity.USER_KEY, toUser)
             startActivity(intent)
-        }
-        else { // firebase notification
+        } else { // firebase notification
             val senderId = intent.getStringExtra("sender_id")
             val senderUsername = intent.getStringExtra("sender_username")
             val senderImg = intent.getStringExtra("sender_img")
@@ -109,7 +132,7 @@ class MainActivity : AppCompatActivity() {
             if (receiverId != null && receiverUsername != null && receiverImg != null && receiverToken != null)
                 currentUser = User(receiverId, receiverUsername, receiverImg, receiverToken)
 
-            if (senderId != null && senderUsername != null && senderImg != null && senderToken != null){
+            if (senderId != null && senderUsername != null && senderImg != null && senderToken != null) {
                 val user = User(senderId, senderUsername, senderImg, senderToken)
 
                 val intent = Intent(this, ChatLogActivity::class.java)
@@ -147,14 +170,18 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {
+                latestMessagesMap.remove(p0.key!!)
+                refreshRecyclerViewMessages()
+
             }
 
         })
     }
 
-    private fun refreshRecyclerViewMessages(){
+    private fun refreshRecyclerViewMessages() {
         adapter.clear()
-        latestMessagesMap.values.forEach{
+        latestMessagesMap.values.forEach {
+            Log.d("test", it.toString())
             adapter.add(LatestMessageRow(it))
         }
     }

@@ -1,5 +1,6 @@
 package com.yakirarie.chatapp
 
+import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
@@ -11,7 +12,7 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.latest_message_row.view.*
 
-class LatestMessageRow(private val chatMessage: ChatMessage): Item<GroupieViewHolder>() {
+class LatestMessageRow(val chatMessage: ChatMessage): Item<GroupieViewHolder>() {
     var chatPartnerUser: User? = null
 
     override fun getLayout(): Int {

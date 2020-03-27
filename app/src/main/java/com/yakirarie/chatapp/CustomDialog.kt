@@ -63,6 +63,21 @@ class CustomDialog : DialogFragment() {
         val ref = FirebaseDatabase.getInstance().getReference("users/${userToDelete!!.uid}")
         ref.removeValue().addOnSuccessListener {
             Log.d(TAG, "user ${userToDelete.username} deleted from users table")
+            deleteUserMessages(userToDelete)
+        }.addOnFailureListener {
+
+            Log.e(TAG, "Failed to delete user-messages : ${it.message}")
+            Toast.makeText(view?.context, "Failed to delete user-messages: ${it.message}", Toast.LENGTH_SHORT).show()
+            progressBarCustomDialog.visibility = View.INVISIBLE
+            dialog?.dismiss()
+
+        }
+    }
+
+    private fun deleteUserMessages(userToDelete: User?){
+        val ref = FirebaseDatabase.getInstance().getReference("user-messages/${userToDelete!!.uid}")
+        ref.removeValue().addOnSuccessListener {
+            Log.d(TAG, "user ${userToDelete.username}  messages deleted from users-messages table")
             deleteUserImage(userToDelete)
         }.addOnFailureListener {
 
@@ -73,6 +88,7 @@ class CustomDialog : DialogFragment() {
 
         }
     }
+
 
     private fun deleteUserImage(userToDelete: User?){
         val imageLocation = extractFilenameFromUrl(userToDelete)
