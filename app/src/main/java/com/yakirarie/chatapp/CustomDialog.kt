@@ -135,10 +135,26 @@ class CustomDialog : DialogFragment() {
             FirebaseStorage.getInstance().getReference("/images/$imageLocation")
         oldRef.delete().addOnSuccessListener {
             Log.d(TAG, "Successfully deleted old image")
+            deleteUserMessagesImages(userToDelete)
+        }.addOnFailureListener {
+            Log.e(TAG, "Failed to delete old image: ${it.message}")
+            Toast.makeText(view?.context, "Failed to delete old image: ${it.message}", Toast.LENGTH_SHORT).show()
+            freezeGui(false)
+            dialog?.dismiss()
+
+        }
+
+    }
+
+    private fun deleteUserMessagesImages(userToDelete: User?){
+        val oldRef =
+            FirebaseStorage.getInstance().getReference("/imagesMessages/${userToDelete!!.uid}")
+        oldRef.delete().addOnSuccessListener {
+            Log.d(TAG, "Successfully deleted messages images")
             deleteUserAuth()
         }.addOnFailureListener {
-            Log.e(TAG, "Failed to delete old image")
-            Toast.makeText(view?.context, "Failed to delete old image: ${it.message}", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "Failed to delete messages images : ${it.message}")
+            Toast.makeText(view?.context, "Failed to delete messages images: ${it.message}", Toast.LENGTH_SHORT).show()
             freezeGui(false)
             dialog?.dismiss()
 
