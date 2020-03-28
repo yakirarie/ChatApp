@@ -45,7 +45,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, ChatLogActivity::class.java)
             val row = item as LatestMessageRow
             if (row.chatPartnerUser == null)
-                removeMessageFromDeletedUser(row.chatMessage.fromId)
+                if (row.chatMessage.fromId == FirebaseAuth.getInstance().uid)
+                    removeMessageFromDeletedUser(row.chatMessage.toId)
+                else
+                    removeMessageFromDeletedUser(row.chatMessage.fromId)
             else {
                 intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
                 startActivity(intent)

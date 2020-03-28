@@ -8,10 +8,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_chat_log.*
@@ -27,6 +24,7 @@ class ChatLogActivity : AppCompatActivity() {
 
     val adapter = GroupAdapter<GroupieViewHolder>()
     var player: MediaPlayer? = null
+    var numberOfOldMessages: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +69,17 @@ class ChatLogActivity : AppCompatActivity() {
         Log.d(TAG, MainActivity.currentUser!!.token)
         val fromId = FirebaseAuth.getInstance().uid
         val toId = toUser.uid
+
         val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
+        ref.addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                numberOfOldMessages = p0.childrenCount.toInt()
+            }
+
+        })
         ref.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
@@ -90,7 +98,10 @@ class ChatLogActivity : AppCompatActivity() {
                         adapter.add(ChatFromItem(chatMessage.text, MainActivity.currentUser!!))
                     } else {
                         adapter.add(ChatToItem(chatMessage.text, toUser))
-                        playMessageSound()
+                        if (numberOfOldMessages != null){
+                            if (adapter.itemCount > numberOfOldMessages!!)
+                                playMessageSound()
+                        }
 
                     }
                 }
