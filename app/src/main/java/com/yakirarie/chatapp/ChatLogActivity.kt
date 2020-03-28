@@ -10,6 +10,8 @@ import com.google.firebase.database.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_chat_log.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class ChatLogActivity : AppCompatActivity() {
@@ -96,9 +98,9 @@ class ChatLogActivity : AppCompatActivity() {
 
                 if (chatMessage != null) {
                     if (chatMessage.fromId == fromId) {
-                        adapter.add(ChatFromItem(chatMessage.text, MainActivity.currentUser!!))
+                        adapter.add(ChatFromItem(chatMessage.text, chatMessage.timestamp, MainActivity.currentUser!!))
                     } else {
-                        adapter.add(ChatToItem(chatMessage.text, toUser))
+                        adapter.add(ChatToItem(chatMessage.text, chatMessage.timestamp, toUser))
                         if (numberOfOldMessages != null) {
                             if (adapter.itemCount > numberOfOldMessages!!)
                                 playMessageSound()
@@ -138,7 +140,7 @@ class ChatLogActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
 
         val chatMessage =
-            ChatMessage(ref.key!!, text, fromId, toId, System.currentTimeMillis() / 1000)
+            ChatMessage(ref.key!!, text, fromId, toId, SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Calendar.getInstance().time))
 
         ref.setValue(chatMessage).addOnSuccessListener {
             Log.d(TAG, "Saved our chat from-message: ${ref.key}")

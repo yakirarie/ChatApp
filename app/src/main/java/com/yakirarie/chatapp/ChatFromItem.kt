@@ -6,13 +6,15 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.chat_from_row.view.*
 
-class ChatFromItem(val text: String, val user: User) : Item<GroupieViewHolder>() {
+class ChatFromItem(val text: String,val timestamp: String, val user: User) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.chat_from_row
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.textViewFromRow.text = text
+        val timeAndDate = timestamp.split(" ")
+        viewHolder.itemView.timestampFromRow.text = "${timeAndDate[0]} ${timeAndDate[1]}"
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl).diskCacheStrategy(
             DiskCacheStrategy.ALL).into(viewHolder.itemView.imageViewFromRow)
     }
