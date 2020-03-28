@@ -2,8 +2,6 @@ package com.yakirarie.chatapp
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -93,6 +91,7 @@ class ChatLogActivity : AppCompatActivity() {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val chatMessage =
                     p0.getValue(ChatMessage::class.java)
+
                 if (chatMessage != null) {
                     if (chatMessage.fromId == fromId) {
                         adapter.add(ChatFromItem(chatMessage.text, MainActivity.currentUser!!))
