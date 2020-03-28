@@ -1,6 +1,5 @@
 package com.yakirarie.chatapp
 
-import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy

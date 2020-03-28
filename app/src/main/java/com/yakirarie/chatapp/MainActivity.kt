@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -46,9 +47,9 @@ class MainActivity : AppCompatActivity() {
             val row = item as LatestMessageRow
             if (row.chatPartnerUser == null)
                 if (row.chatMessage.fromId == FirebaseAuth.getInstance().uid)
-                    removeMessageFromDeletedUser(row.chatMessage.toId)
+                    removeDeletedUserInteractionsWithYou(row.chatMessage.toId)
                 else
-                    removeMessageFromDeletedUser(row.chatMessage.fromId)
+                    removeDeletedUserInteractionsWithYou(row.chatMessage.fromId)
             else {
                 intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
                 startActivity(intent)
@@ -69,18 +70,39 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun removeMessageFromDeletedUser(deletedId: String) {
+    private fun removeDeletedUserInteractionsWithYou(deletedId: String) {
+        Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
         val uid = FirebaseAuth.getInstance().uid
-        val ref = FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
-        ref.removeValue().addOnSuccessListener {
+        val refLatest = FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
+        refLatest.removeValue().addOnSuccessListener {
             Log.d(TAG, "user $deletedId deleted from your latest messages")
             Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
 
         }.addOnFailureListener {
 
-            Log.e(TAG, "Failed to delete user-messages : ${it.message}")
+            Log.e(TAG, "Failed to delete latest-messages with deleted : ${it.message}")
 
         }
+
+        val refMessages = FirebaseDatabase.getInstance().getReference("user-messages/$uid/$deletedId")
+        refMessages.removeValue().addOnSuccessListener {
+            Log.d(TAG, "user $deletedId deleted from your messages")
+
+        }.addOnFailureListener {
+            Log.e(TAG, "Failed to delete user-messages with deleted : ${it.message}")
+
+        }
+
+//        val refImages =
+//            FirebaseStorage.getInstance().getReference("/imagesMessages/$uid/$deletedId")
+//        refImages.delete().addOnSuccessListener {
+//            Log.d(TAG, "Successfully deleted messages images with deleted")
+//        }.addOnFailureListener {
+//            Log.e(TAG, "Failed to delete messages images : ${it.message}")
+//
+//        }
+
+
 
     }
 

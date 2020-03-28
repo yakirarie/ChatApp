@@ -44,37 +44,45 @@ class CustomDialog : DialogFragment() {
         custom_dialog_btn_approve.setOnClickListener {
             val userToDelete = arguments?.getParcelable<User>("USER_TO_DELETE")
             if (userToDelete == null) {
-                Toast.makeText(view.context, "Couldn't delete user, please try again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    view.context,
+                    "Couldn't delete user, please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 dialog?.dismiss()
             }
-            if (email_custom_dialog.text.isEmpty() || password_custom_dialog.text.isEmpty()){
-                Toast.makeText(view.context, "Please fill all of the above", Toast.LENGTH_SHORT).show()
+            if (email_custom_dialog.text.isEmpty() || password_custom_dialog.text.isEmpty()) {
+                Toast.makeText(view.context, "Please fill all of the above", Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
             freezeGui(true)
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email_custom_dialog.text.toString(), password_custom_dialog.text.toString()).addOnSuccessListener {
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(
+                email_custom_dialog.text.toString(),
+                password_custom_dialog.text.toString()
+            ).addOnSuccessListener {
                 deleteUser(userToDelete)
+
             }.addOnFailureListener {
                 Log.e(TAG, "Failed to login: ${it.message}")
-                Toast.makeText(view.context, "Failed to login: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(view.context, "Failed to login: ${it.message}", Toast.LENGTH_SHORT)
+                    .show()
                 freezeGui(false)
 
             }
 
 
-
         }
     }
 
-    private fun freezeGui(toFreeze: Boolean){
-        if (toFreeze){
+    private fun freezeGui(toFreeze: Boolean) {
+        if (toFreeze) {
             progressBarCustomDialog.visibility = View.VISIBLE
             custom_dialog_btn_approve.isClickable = false
             custom_dialog_btn_yes.isClickable = false
             custom_dialog_btn_no.isClickable = false
             custom_dialog_btn_cancel.isClickable = false
-        }
-        else {
+        } else {
             progressBarCustomDialog.visibility = View.INVISIBLE
             custom_dialog_btn_approve.isClickable = true
             custom_dialog_btn_yes.isClickable = true
@@ -84,7 +92,7 @@ class CustomDialog : DialogFragment() {
         }
     }
 
-    private fun deleteUser(userToDelete: User?){
+    private fun deleteUser(userToDelete: User?) {
         val ref = FirebaseDatabase.getInstance().getReference("users/${userToDelete!!.uid}")
         ref.removeValue().addOnSuccessListener {
             Log.d(TAG, "user ${userToDelete.username} deleted from users table")
@@ -92,14 +100,12 @@ class CustomDialog : DialogFragment() {
         }.addOnFailureListener {
 
             Log.e(TAG, "Failed to delete user-messages : ${it.message}")
-            Toast.makeText(view?.context, "Failed to delete user-messages: ${it.message}", Toast.LENGTH_SHORT).show()
-            freezeGui(false)
-            dialog?.dismiss()
+            deleteUserMessages(userToDelete)
 
         }
     }
 
-    private fun deleteUserMessages(userToDelete: User?){
+    private fun deleteUserMessages(userToDelete: User?) {
         val ref = FirebaseDatabase.getInstance().getReference("user-messages/${userToDelete!!.uid}")
         ref.removeValue().addOnSuccessListener {
             Log.d(TAG, "user ${userToDelete.username}  messages deleted from users-messages table")
@@ -107,73 +113,72 @@ class CustomDialog : DialogFragment() {
         }.addOnFailureListener {
 
             Log.e(TAG, "Failed to delete username : ${it.message}")
-            Toast.makeText(view?.context, "Failed to delete username: ${it.message}", Toast.LENGTH_SHORT).show()
-            freezeGui(false)
-            dialog?.dismiss()
+            deleteUserLatestMessages(userToDelete)
+
 
         }
     }
 
-    private fun deleteUserLatestMessages(userToDelete: User?){
-        val ref = FirebaseDatabase.getInstance().getReference("latest-messages/${userToDelete!!.uid}")
+    private fun deleteUserLatestMessages(userToDelete: User?) {
+        val ref =
+            FirebaseDatabase.getInstance().getReference("latest-messages/${userToDelete!!.uid}")
         ref.removeValue().addOnSuccessListener {
             Log.d(TAG, "user ${userToDelete.username}  messages deleted from latest-messages table")
             deleteUserImage(userToDelete)
         }.addOnFailureListener {
             Log.e(TAG, "Failed to delete latest-messages : ${it.message}")
-            Toast.makeText(view?.context, "Failed to delete latest-messages: ${it.message}", Toast.LENGTH_SHORT).show()
-            progressBarCustomDialog.visibility = View.INVISIBLE
-            dialog?.dismiss()
+            deleteUserImage(userToDelete)
 
         }
     }
 
 
-    private fun deleteUserImage(userToDelete: User?){
+    private fun deleteUserImage(userToDelete: User?) {
         val imageLocation = extractFilenameFromUrl(userToDelete)
         val oldRef =
             FirebaseStorage.getInstance().getReference("/images/$imageLocation")
         oldRef.delete().addOnSuccessListener {
             Log.d(TAG, "Successfully deleted old image")
-            deleteUserMessagesImages(userToDelete)
-        }.addOnFailureListener {
-            Log.e(TAG, "Failed to delete old image: ${it.message}")
-            Toast.makeText(view?.context, "Failed to delete old image: ${it.message}", Toast.LENGTH_SHORT).show()
-            freezeGui(false)
-            dialog?.dismiss()
-
-        }
-
-    }
-
-    private fun deleteUserMessagesImages(userToDelete: User?){
-        val oldRef =
-            FirebaseStorage.getInstance().getReference("/imagesMessages/${userToDelete!!.uid}")
-        oldRef.delete().addOnSuccessListener {
-            Log.d(TAG, "Successfully deleted messages images")
             deleteUserAuth()
         }.addOnFailureListener {
-            Log.e(TAG, "Failed to delete messages images : ${it.message}")
-            Toast.makeText(view?.context, "Failed to delete messages images: ${it.message}", Toast.LENGTH_SHORT).show()
-            freezeGui(false)
-            dialog?.dismiss()
-
+            deleteUserAuth()
+            Log.e(TAG, "Failed to delete old image: ${it.message} $imageLocation")
         }
 
     }
 
-    private fun deleteUserAuth(){
+//    private fun deleteUserMessagesImages(userToDelete: User?) {
+//        val oldRef =
+//            FirebaseStorage.getInstance().getReference("/imagesMessages/${userToDelete!!.uid}")
+//        oldRef.delete().addOnSuccessListener {
+//            Log.d(TAG, "Successfully deleted messages images ${userToDelete.uid}")
+//            deleteUserAuth()
+//        }.addOnFailureListener {
+//            deleteUserAuth()
+//            Log.e(TAG, "Failed to delete messages images : ${it.message}")
+//        }
+//
+//    }
+
+    private fun deleteUserAuth() {
         FirebaseAuth.getInstance().currentUser?.delete()?.addOnSuccessListener {
-            Toast.makeText(view?.context, "User deleted successfully!", Toast.LENGTH_SHORT).show()
-            freezeGui(false)
+            //            Toast.makeText(view?.context, "User deleted successfully!", Toast.LENGTH_SHORT).show()
+//            freezeGui(false)
             FirebaseAuth.getInstance().signOut()
+            Toast.makeText(view!!.context, "User deleted successfully!", Toast.LENGTH_SHORT)
+                .show()
+            freezeGui(false)
             dialog?.dismiss()
             activity?.finish()
         }?.addOnFailureListener {
-            Log.d(TAG, "Failed to delete authentication")
-            Toast.makeText(view?.context, "Failed to delete authentication: ${it.message}", Toast.LENGTH_SHORT).show()
+            FirebaseAuth.getInstance().signOut()
             freezeGui(false)
             dialog?.dismiss()
+            activity?.finish()
+            Log.d(TAG, "Failed to delete authentication")
+//            Toast.makeText(view?.context, "Failed to delete authentication: ${it.message}", Toast.LENGTH_SHORT).show()
+//            freezeGui(false)
+//            dialog?.dismiss()
         }
 
 
@@ -184,7 +189,11 @@ class CustomDialog : DialogFragment() {
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return inflater.inflate(R.layout.custom_dialog, container, false)
     }
