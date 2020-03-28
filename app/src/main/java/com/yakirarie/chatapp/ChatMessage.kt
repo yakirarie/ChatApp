@@ -8,7 +8,8 @@ class ChatMessage(
     val text: String,
     val fromId: String,
     val toId: String,
-    val timestamp: String
+    val timestamp: String,
+    val image: Boolean
 ) {
-    constructor() : this("", "", "", "", "")
+    constructor() : this("", "", "", "", "", false)
 }

@@ -1,16 +1,23 @@
 package com.yakirarie.chatapp
 
+import android.app.Activity
+import android.content.Intent
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_chat_log.*
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 
@@ -98,9 +105,10 @@ class ChatLogActivity : AppCompatActivity() {
 
                 if (chatMessage != null) {
                     if (chatMessage.fromId == fromId) {
-                        adapter.add(ChatFromItem(chatMessage.text, chatMessage.timestamp, MainActivity.currentUser!!))
+                        Log.d(TAG, "ma ze hazain haze" + chatMessage.image.toString())
+                        adapter.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
                     } else {
-                        adapter.add(ChatToItem(chatMessage.text, chatMessage.timestamp, toUser))
+                        adapter.add(ChatToItem(chatMessage, toUser))
                         if (numberOfOldMessages != null) {
                             if (adapter.itemCount > numberOfOldMessages!!)
                                 playMessageSound()
@@ -120,15 +128,42 @@ class ChatLogActivity : AppCompatActivity() {
 
     }
 
+    fun sendImageClicked(view: View) {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, 0)
+    }
 
-    fun sendBtnClicked(view: View) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
+            val selectedPhotoUri = data.data
+            uploadImageToFirebaseStorage(selectedPhotoUri!!)
+        }
+    }
 
-        val text = editTextChatLog.text.toString()
-        if (text.isEmpty()) return
+    private fun uploadImageToFirebaseStorage(selectedPhotoUri: Uri) {
+        val filename = UUID.randomUUID().toString()
+        val ref = FirebaseStorage.getInstance().getReference("/imagesMessages/$filename")
 
+        ref.putFile(selectedPhotoUri).addOnSuccessListener {
+            Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
+            ref.downloadUrl.addOnSuccessListener {
+                Log.d(TAG, "File location: $it")
+                sendImageMessage(it.toString())
+            }
+        }.addOnFailureListener {
+            Log.d(TAG, "Failed to upload Image: ${it.message}")
+            Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
+                .show()
+
+        }
+
+    }
+
+    private fun sendImageMessage(image: String){
         val fromId = FirebaseAuth.getInstance().uid ?: return
         val toId = toUser.uid
-
 
         val ref =
             FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
@@ -140,7 +175,48 @@ class ChatLogActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
 
         val chatMessage =
-            ChatMessage(ref.key!!, text, fromId, toId, SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Calendar.getInstance().time))
+            ChatMessage(ref.key!!, image, fromId, toId, SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Calendar.getInstance().time), true)
+
+        ref.setValue(chatMessage).addOnSuccessListener {
+            Log.d(TAG, "Saved our chat from-message: ${ref.key}")
+            editTextChatLog.text.clear()
+            recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
+        }
+
+        toRef.setValue(chatMessage).addOnSuccessListener {
+            Log.d(TAG, "Saved our chat to-message: ${toRef.key}")
+        }
+
+        latestMessagesRef.setValue(chatMessage).addOnSuccessListener {
+            Log.d(TAG, "Saved our chat latest-from-message: ${latestMessagesRef.key}")
+        }
+
+        latestMessagesToRef.setValue(chatMessage).addOnSuccessListener {
+            Log.d(TAG, "Saved our chat latest-to-message: ${latestMessagesToRef.key}")
+        }
+
+    }
+
+
+    fun sendBtnClicked(view: View) {
+
+        val text = editTextChatLog.text.toString()
+        if (text.isEmpty()) return
+
+        val fromId = FirebaseAuth.getInstance().uid ?: return
+        val toId = toUser.uid
+
+        val ref =
+            FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
+        val toRef =
+            FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
+        val latestMessagesRef =
+            FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
+        val latestMessagesToRef =
+            FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
+
+        val chatMessage =
+            ChatMessage(ref.key!!, text, fromId, toId, SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Calendar.getInstance().time), false)
 
         ref.setValue(chatMessage).addOnSuccessListener {
             Log.d(TAG, "Saved our chat from-message: ${ref.key}")

@@ -6,6 +6,15 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp">
 
+    <ImageView
+        android:id="@+id/sendImageFromRow"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/timestampFromRow"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textViewFromRow"
         android:layout_width="wrap_content"
@@ -15,7 +24,7 @@
         android:background="@drawable/rounded_textview"
         android:maxWidth="240dp"
         android:padding="16dp"
-        android:text="This is my message"
+        tools:text="This is my message"
         app:layout_constraintStart_toEndOf="@+id/imageViewFromRow"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,12 +36,11 @@
         android:layout_marginTop="4dp"
         android:textColor="@android:color/black"
         android:textSize="8sp"
+        android:gravity="center"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewFromRow"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="17:11 28/03/2020" />
+        app:layout_constraintTop_toBottomOf="@+id/imageViewFromRow"
+        tools:text="17:11\n28/03/2020" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imageViewFromRow"
