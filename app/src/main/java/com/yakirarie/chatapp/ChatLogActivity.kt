@@ -27,6 +27,7 @@ class ChatLogActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
+        initPlayer()
         recyclerViewChatLog.adapter = adapter
         toUser = intent.getParcelableExtra(NewMessageActivity.USER_KEY)
         supportActionBar?.title = toUser.username
@@ -35,21 +36,16 @@ class ChatLogActivity : AppCompatActivity() {
     }
 
     private fun playMessageSound() {
-        if (player == null) {
-            player = MediaPlayer.create(applicationContext, R.raw.notification_sound)
-            player!!.setOnCompletionListener {
-                stopMessageSound()
-
-            }
-        }
-        player!!.start()
-    }
-
-    private fun pauseMessageSound() {
         if (player != null)
-            player!!.pause()
+            player!!.start()
+
     }
 
+    private fun initPlayer() {
+        if (player == null)
+            player = MediaPlayer.create(applicationContext, R.raw.notification_sound)
+    }
+    
     private fun stopMessageSound() {
         if (player != null) {
             player!!.stop()
@@ -63,13 +59,19 @@ class ChatLogActivity : AppCompatActivity() {
         stopMessageSound()
     }
 
+    override fun onStart() {
+        super.onStart()
+        initPlayer()
+    }
+
+
     private fun listenForMessages() {
         Log.d(TAG, MainActivity.currentUser!!.token)
         val fromId = FirebaseAuth.getInstance().uid
         val toId = toUser.uid
 
         val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
-        ref.addListenerForSingleValueEvent(object: ValueEventListener{
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
 
@@ -97,7 +99,7 @@ class ChatLogActivity : AppCompatActivity() {
                         adapter.add(ChatFromItem(chatMessage.text, MainActivity.currentUser!!))
                     } else {
                         adapter.add(ChatToItem(chatMessage.text, toUser))
-                        if (numberOfOldMessages != null){
+                        if (numberOfOldMessages != null) {
                             if (adapter.itemCount > numberOfOldMessages!!)
                                 playMessageSound()
                         }
