@@ -10,6 +10,7 @@
         android:id="@+id/sendImageFromRow"
         android:layout_width="170dp"
         android:layout_height="170dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="8dp"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@+id/timestampFromRow"

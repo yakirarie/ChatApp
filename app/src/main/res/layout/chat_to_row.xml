@@ -11,6 +11,7 @@
         android:layout_width="170dp"
         android:layout_height="170dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="40dp"
         android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/timestampToRow"
         app:layout_constraintTop_toTopOf="parent" />

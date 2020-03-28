@@ -1,6 +1,7 @@
 package com.yakirarie.chatapp
 
 import android.util.Log
+import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
@@ -20,7 +21,19 @@ class LatestMessageRow(val chatMessage: ChatMessage): Item<GroupieViewHolder>() 
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.textViewLatestMessage.text = chatMessage.text
+        if (chatMessage.image){
+            viewHolder.itemView.sendImageLatestMessage.visibility = View.VISIBLE
+            viewHolder.itemView.textViewLatestMessage.visibility = View.GONE
+            Glide.with(viewHolder.itemView.context).load(chatMessage.text).diskCacheStrategy(
+                DiskCacheStrategy.ALL).into(viewHolder.itemView.sendImageLatestMessage)
+
+        }
+        else {
+            viewHolder.itemView.sendImageLatestMessage.visibility = View.GONE
+            viewHolder.itemView.textViewLatestMessage.visibility = View.VISIBLE
+            viewHolder.itemView.textViewLatestMessage.text = chatMessage.text
+        }
+
         val chatPartnerId: String = if(chatMessage.fromId == FirebaseAuth.getInstance().uid){
             chatMessage.toId
         } else

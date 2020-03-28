@@ -144,7 +144,8 @@ class ChatLogActivity : AppCompatActivity() {
 
     private fun uploadImageToFirebaseStorage(selectedPhotoUri: Uri) {
         val filename = UUID.randomUUID().toString()
-        val ref = FirebaseStorage.getInstance().getReference("/imagesMessages/$filename")
+        val uid = FirebaseAuth.getInstance().uid
+        val ref = FirebaseStorage.getInstance().getReference("/imagesMessages/$uid/$filename")
 
         ref.putFile(selectedPhotoUri).addOnSuccessListener {
             Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
