@@ -107,7 +107,9 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             .setWhen(System.currentTimeMillis())
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(resultPendingIntent)
-            .setStyle(NotificationCompat.BigPictureStyle().bigPicture(imageBitmap))
+
+        if(imageBitmap != null)
+            notificationBuilder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(imageBitmap))
 
         mNotificationManager.notify(1000, notificationBuilder.build())
     }
