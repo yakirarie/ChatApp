@@ -44,9 +44,11 @@ class MyProfileActivity : AppCompatActivity() {
             override fun onDataChange(p0: DataSnapshot) {
                 currentUser = p0.getValue(User::class.java)!!
                 usernameMyProfile.setText(currentUser!!.username)
-                Glide.with(applicationContext).load(currentUser!!.profileImageUrl).diskCacheStrategy(
-                    DiskCacheStrategy.ALL
-                ).into(changeProfileMyProfile)
+                Glide.with(applicationContext).load(currentUser!!.profileImageUrl)
+                    .placeholder(R.drawable.ic_loading_sign)
+                    .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                        DiskCacheStrategy.ALL
+                    ).into(changeProfileMyProfile)
 
             }
 
@@ -85,14 +87,13 @@ class MyProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun freezeGui(toFreeze: Boolean){
-        if (toFreeze){
+    private fun freezeGui(toFreeze: Boolean) {
+        if (toFreeze) {
             progressBarMyProfile.visibility = View.VISIBLE
             createUserBtn.isClickable = false
             selectPhotoBtn.isClickable = false
             deleteAccountBtn.isClickable = false
-        }
-        else{
+        } else {
             progressBarMyProfile.visibility = View.GONE
             createUserBtn.isClickable = true
             selectPhotoBtn.isClickable = true
@@ -141,9 +142,11 @@ class MyProfileActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
-            Glide.with(applicationContext).load(selectedPhotoUri).diskCacheStrategy(
-                DiskCacheStrategy.ALL
-            ).into(changeProfileMyProfile)
+            Glide.with(applicationContext).load(selectedPhotoUri)
+                .placeholder(R.drawable.ic_loading_sign)
+                .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                    DiskCacheStrategy.ALL
+                ).into(changeProfileMyProfile)
 
         }
     }

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -16,10 +15,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_chat_log.*
-import kotlinx.android.synthetic.main.chat_from_row.*
-import kotlinx.android.synthetic.main.chat_to_row.*
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.*
 
 
@@ -221,7 +217,7 @@ class ChatLogActivity : AppCompatActivity() {
 
     fun sendBtnClicked(view: View) {
 
-        val text = editTextChatLog.text.toString()
+        val text = editTextChatLog.text.trim().toString()
         if (text.isEmpty()) return
 
         val fromId = FirebaseAuth.getInstance().uid ?: return

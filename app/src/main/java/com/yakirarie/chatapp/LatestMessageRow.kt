@@ -12,7 +12,7 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.latest_message_row.view.*
 
-class LatestMessageRow(val chatMessage: ChatMessage): Item<GroupieViewHolder>() {
+class LatestMessageRow(val chatMessage: ChatMessage) : Item<GroupieViewHolder>() {
     var chatPartnerUser: User? = null
 
     override fun getLayout(): Int {
@@ -20,26 +20,28 @@ class LatestMessageRow(val chatMessage: ChatMessage): Item<GroupieViewHolder>() 
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        if (chatMessage.image){
+        if (chatMessage.image) {
             viewHolder.itemView.sendImageLatestMessage.visibility = View.VISIBLE
             viewHolder.itemView.textViewLatestMessage.visibility = View.GONE
-            Glide.with(viewHolder.itemView.context).load(chatMessage.text).diskCacheStrategy(
-                DiskCacheStrategy.ALL).into(viewHolder.itemView.sendImageLatestMessage)
+            Glide.with(viewHolder.itemView.context).load(chatMessage.text)
+                .placeholder(R.drawable.ic_loading_sign)
+                .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                    DiskCacheStrategy.ALL
+                ).into(viewHolder.itemView.sendImageLatestMessage)
 
-        }
-        else {
+        } else {
             viewHolder.itemView.sendImageLatestMessage.visibility = View.GONE
             viewHolder.itemView.textViewLatestMessage.visibility = View.VISIBLE
             viewHolder.itemView.textViewLatestMessage.text = chatMessage.text
         }
 
-        val chatPartnerId: String = if(chatMessage.fromId == FirebaseAuth.getInstance().uid){
+        val chatPartnerId: String = if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
             chatMessage.toId
         } else
             chatMessage.fromId
 
         val ref = FirebaseDatabase.getInstance().getReference("/users/$chatPartnerId")
-        ref.addListenerForSingleValueEvent(object : ValueEventListener{
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
 
             }
@@ -47,8 +49,11 @@ class LatestMessageRow(val chatMessage: ChatMessage): Item<GroupieViewHolder>() 
             override fun onDataChange(p0: DataSnapshot) {
                 chatPartnerUser = p0.getValue(User::class.java)
                 viewHolder.itemView.textViewLatestUsername.text = chatPartnerUser?.username
-                Glide.with(viewHolder.itemView.context).load(chatPartnerUser?.profileImageUrl).diskCacheStrategy(
-                    DiskCacheStrategy.ALL).into(viewHolder.itemView.imageViewLatestProfile)
+                Glide.with(viewHolder.itemView.context).load(chatPartnerUser?.profileImageUrl)
+                    .placeholder(R.drawable.ic_loading_sign)
+                    .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                        DiskCacheStrategy.ALL
+                    ).into(viewHolder.itemView.imageViewLatestProfile)
 
             }
 

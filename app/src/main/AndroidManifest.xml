@@ -9,6 +9,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".FullScreenImage"></activity>
         <activity android:name=".MyProfileActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
