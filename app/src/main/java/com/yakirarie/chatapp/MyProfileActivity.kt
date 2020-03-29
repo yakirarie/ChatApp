@@ -60,7 +60,7 @@ class MyProfileActivity : AppCompatActivity() {
         if (currentUser == null) return
         val bundle = Bundle()
         bundle.putParcelable("USER_TO_DELETE", currentUser)
-        val customDialog = CustomDialog()
+        val customDialog = DeleteUserDialog()
         customDialog.arguments = bundle
         customDialog.show(supportFragmentManager, "custom dialog")
     }

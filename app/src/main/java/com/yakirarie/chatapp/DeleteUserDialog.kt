@@ -12,10 +12,9 @@ import androidx.fragment.app.DialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.activity_my_profile.*
-import kotlinx.android.synthetic.main.custom_dialog.*
+import kotlinx.android.synthetic.main.delete_user_dialog.*
 
-class CustomDialog : DialogFragment() {
+class DeleteUserDialog : DialogFragment() {
 
     private val TAG = "CustomDialogDebug"
 
@@ -198,7 +197,7 @@ class CustomDialog : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        return inflater.inflate(R.layout.custom_dialog, container, false)
+        return inflater.inflate(R.layout.delete_user_dialog, container, false)
     }
 
 }
