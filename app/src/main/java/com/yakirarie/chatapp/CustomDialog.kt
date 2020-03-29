@@ -139,31 +139,37 @@ class CustomDialog : DialogFragment() {
             FirebaseStorage.getInstance().getReference("/images/$imageLocation")
         oldRef.delete().addOnSuccessListener {
             Log.d(TAG, "Successfully deleted old image")
-            deleteUserAuth()
+            deleteUserMessagesImages(userToDelete)
         }.addOnFailureListener {
-            deleteUserAuth()
+            deleteUserMessagesImages(userToDelete)
             Log.e(TAG, "Failed to delete old image: ${it.message} $imageLocation")
         }
 
     }
 
-//    private fun deleteUserMessagesImages(userToDelete: User?) {
-//        val oldRef =
-//            FirebaseStorage.getInstance().getReference("/imagesMessages/${userToDelete!!.uid}")
-//        oldRef.delete().addOnSuccessListener {
-//            Log.d(TAG, "Successfully deleted messages images ${userToDelete.uid}")
-//            deleteUserAuth()
-//        }.addOnFailureListener {
-//            deleteUserAuth()
-//            Log.e(TAG, "Failed to delete messages images : ${it.message}")
-//        }
-//
-//    }
+    private fun deleteUserMessagesImages(userToDelete: User?) {
+        val oldRef =
+            FirebaseStorage.getInstance().getReference("/imagesMessages/${userToDelete!!.uid}")
+        oldRef.listAll().addOnSuccessListener {
+            it.items.forEach { storageReference ->
+                storageReference.delete().addOnSuccessListener {
+                    Log.d(TAG, "Successfully deleted message image ${storageReference.name}")
+                }.addOnFailureListener {
+                    Log.e(TAG, "Failed to deleted message image ${storageReference.name}\n${it.message}")
+                }
+
+            }
+            deleteUserAuth()
+        }.addOnFailureListener {
+            Log.e(TAG, "Failed to deleted messages images directory ${it.message}")
+            deleteUserAuth()
+        }
+
+
+    }
 
     private fun deleteUserAuth() {
         FirebaseAuth.getInstance().currentUser?.delete()?.addOnSuccessListener {
-            //            Toast.makeText(view?.context, "User deleted successfully!", Toast.LENGTH_SHORT).show()
-//            freezeGui(false)
             FirebaseAuth.getInstance().signOut()
             Toast.makeText(view!!.context, "User deleted successfully!", Toast.LENGTH_SHORT)
                 .show()
@@ -176,9 +182,6 @@ class CustomDialog : DialogFragment() {
             dialog?.dismiss()
             activity?.finish()
             Log.d(TAG, "Failed to delete authentication")
-//            Toast.makeText(view?.context, "Failed to delete authentication: ${it.message}", Toast.LENGTH_SHORT).show()
-//            freezeGui(false)
-//            dialog?.dismiss()
         }
 
 

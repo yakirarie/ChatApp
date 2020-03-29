@@ -49,8 +49,12 @@ exports.newMessage = functions.database.ref('/latest-messages/{id1}/{id2}')
                 sender_token: senderUser.token
             }
 
-
         };
+
+        if (chatMessage.image) {
+            payload.notification.body = "";
+            payload.notification.image = messageText;
+        }
         try {
             const response = await admin.messaging().sendToDevice(recieverUser.token, payload);
             return console.log("Successfully sent message:", response);

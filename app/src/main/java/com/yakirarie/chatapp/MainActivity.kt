@@ -93,16 +93,6 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-//        val refImages =
-//            FirebaseStorage.getInstance().getReference("/imagesMessages/$uid/$deletedId")
-//        refImages.delete().addOnSuccessListener {
-//            Log.d(TAG, "Successfully deleted messages images with deleted")
-//        }.addOnFailureListener {
-//            Log.e(TAG, "Failed to delete messages images : ${it.message}")
-//
-//        }
-
-
 
     }
 
