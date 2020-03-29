@@ -1,7 +1,6 @@
 package com.yakirarie.chatapp
 
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,7 +10,9 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Menu
 import android.view.View
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +20,7 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_chat_log.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -113,15 +115,17 @@ class ChatLogActivity : AppCompatActivity() {
                 if (chatMessage != null) {
                     if (chatMessage.fromId == fromId) {
                         adapter.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
+                        freezeGui(false)
+
                     } else {
                         adapter.add(ChatToItem(chatMessage, toUser))
+
                         if (numberOfOldMessages != null) {
                             if (adapter.itemCount > numberOfOldMessages!!)
                                 playMessageSound()
                         }
 
                     }
-                    freezeGui(false)
                 }
 
                 recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
@@ -140,10 +144,12 @@ class ChatLogActivity : AppCompatActivity() {
             progressBarChatLog.visibility = View.VISIBLE
             sendBtnChatLog.isClickable = false
             pickImageChatLog.isClickable = false
+            openCameraChatLog.isClickable = false
         } else {
             progressBarChatLog.visibility = View.GONE
             sendBtnChatLog.isClickable = true
             pickImageChatLog.isClickable = true
+            openCameraChatLog.isClickable = true
         }
     }
 
@@ -233,6 +239,7 @@ class ChatLogActivity : AppCompatActivity() {
         }
 
     }
+
 
     fun openCameraClicked(view: View) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -336,5 +343,6 @@ class ChatLogActivity : AppCompatActivity() {
         }
 
     }
+
 
 }

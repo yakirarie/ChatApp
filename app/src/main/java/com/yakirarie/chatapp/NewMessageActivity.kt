@@ -4,15 +4,19 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import androidx.appcompat.widget.SearchView
 import kotlinx.android.synthetic.main.activity_new_message.*
+import java.util.*
+import kotlin.collections.HashMap
 
-class NewMessageActivity : AppCompatActivity() {
+class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
 
     private val TAG = "NewMessageActivityDebug"
 
@@ -22,6 +26,7 @@ class NewMessageActivity : AppCompatActivity() {
 
     val adapter = GroupAdapter<GroupieViewHolder>()
     val usersMap = HashMap<String, User>()
+    val usersList = mutableListOf<UserItem>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +55,10 @@ class NewMessageActivity : AppCompatActivity() {
 
     private fun refreshRecyclerUsers() {
         adapter.clear()
+        usersList.clear()
         usersMap.values.forEach {
             adapter.add(UserItem(it))
+            usersList.add(UserItem(it))
         }
     }
 
@@ -107,5 +114,31 @@ class NewMessageActivity : AppCompatActivity() {
         )
 
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.nav_search, menu)
+        val menuItem = menu!!.findItem(R.id.menu_search)
+        val searchView = menuItem.actionView as SearchView
+        searchView.setOnQueryTextListener(this)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onQueryTextSubmit(p0: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(p0: String?): Boolean {
+        if (p0 == null) return false
+        val userInput = p0.toLowerCase(Locale.ROOT)
+        val newList = mutableListOf<UserItem>()
+        for (userItem in usersList){
+            if (userItem.user!!.username.toLowerCase(Locale.ROOT).contains(userInput)){
+                newList.add(userItem)
+            }
+        }
+        adapter.update(newList)
+        return true
     }
 }
