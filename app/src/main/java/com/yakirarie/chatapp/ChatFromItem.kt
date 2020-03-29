@@ -15,7 +15,6 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        Log.d("bdika", "bdika "+chatMessage.image)
         if (chatMessage.image) {
             viewHolder.itemView.sendImageFromRow.visibility = View.VISIBLE
             viewHolder.itemView.textViewFromRow.visibility = View.GONE

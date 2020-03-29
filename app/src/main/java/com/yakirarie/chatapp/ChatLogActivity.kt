@@ -16,6 +16,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_chat_log.*
+import kotlinx.android.synthetic.main.chat_from_row.*
+import kotlinx.android.synthetic.main.chat_to_row.*
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.*
@@ -115,6 +117,7 @@ class ChatLogActivity : AppCompatActivity() {
                         }
 
                     }
+                    freezeGui(false)
                 }
 
                 recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
@@ -128,7 +131,21 @@ class ChatLogActivity : AppCompatActivity() {
 
     }
 
+    private fun freezeGui(toFreeze: Boolean){
+        if (toFreeze){
+            progressBarChatLog.visibility = View.VISIBLE
+            sendBtnChatLog.isClickable = false
+            pickImageChatLog.isClickable = false
+        }
+        else{
+            progressBarChatLog.visibility = View.GONE
+            sendBtnChatLog.isClickable = true
+            pickImageChatLog.isClickable = true
+        }
+    }
+
     fun sendImageClicked(view: View) {
+        freezeGui(true)
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         startActivityForResult(intent, 0)
@@ -139,6 +156,10 @@ class ChatLogActivity : AppCompatActivity() {
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             val selectedPhotoUri = data.data
             uploadImageToFirebaseStorage(selectedPhotoUri!!)
+        }
+        else{
+            freezeGui(false)
+
         }
     }
 
