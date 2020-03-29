@@ -1,10 +1,15 @@
 package com.yakirarie.chatapp
 
 import android.app.Activity
+import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -31,6 +36,10 @@ class ChatLogActivity : AppCompatActivity() {
     var player: MediaPlayer? = null
     var numberOfOldMessages: Int? = null
 
+    private val PERMISSION_CODE = 1000
+    private val IMAGE_CAPTURE_CODE = 1001
+    var imageUri: Uri? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
@@ -52,7 +61,7 @@ class ChatLogActivity : AppCompatActivity() {
         if (player == null)
             player = MediaPlayer.create(applicationContext, R.raw.notification_sound)
     }
-    
+
     private fun stopMessageSound() {
         if (player != null) {
             player!!.stop()
@@ -126,13 +135,12 @@ class ChatLogActivity : AppCompatActivity() {
 
     }
 
-    private fun freezeGui(toFreeze: Boolean){
-        if (toFreeze){
+    private fun freezeGui(toFreeze: Boolean) {
+        if (toFreeze) {
             progressBarChatLog.visibility = View.VISIBLE
             sendBtnChatLog.isClickable = false
             pickImageChatLog.isClickable = false
-        }
-        else{
+        } else {
             progressBarChatLog.visibility = View.GONE
             sendBtnChatLog.isClickable = true
             pickImageChatLog.isClickable = true
@@ -151,8 +159,10 @@ class ChatLogActivity : AppCompatActivity() {
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             val selectedPhotoUri = data.data
             uploadImageToFirebaseStorage(selectedPhotoUri!!)
-        }
-        else{
+        } else if (requestCode == IMAGE_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
+            Log.d("IMAGE","image uri ${imageUri.toString()}")
+            uploadImageToFirebaseStorage(imageUri!!)
+        } else {
             freezeGui(false)
 
         }
@@ -178,7 +188,7 @@ class ChatLogActivity : AppCompatActivity() {
 
     }
 
-    private fun sendImageMessage(image: String){
+    private fun sendImageMessage(image: String) {
         val fromId = FirebaseAuth.getInstance().uid ?: return
         val toId = toUser.uid
 
@@ -192,7 +202,17 @@ class ChatLogActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
 
         val chatMessage =
-            ChatMessage(ref.key!!, image, fromId, toId, SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Calendar.getInstance().time), true)
+            ChatMessage(
+                ref.key!!,
+                image,
+                fromId,
+                toId,
+                SimpleDateFormat(
+                    "dd/MM/yyyy HH:mm",
+                    Locale.getDefault()
+                ).format(Calendar.getInstance().time),
+                true
+            )
 
         ref.setValue(chatMessage).addOnSuccessListener {
             Log.d(TAG, "Saved our chat from-message: ${ref.key}")
@@ -214,6 +234,58 @@ class ChatLogActivity : AppCompatActivity() {
 
     }
 
+    fun openCameraClicked(view: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || checkSelfPermission(
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_DENIED
+            ) {
+                val permission = arrayOf(
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+                requestPermissions(permission, PERMISSION_CODE)
+
+            } else {
+                openCamera()
+            }
+        } else {
+            openCamera()
+        }
+    }
+
+    private fun openCamera() {
+        freezeGui(true)
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.TITLE, "New Picture")
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From The Camera")
+        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE)
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty()) {
+                    grantResults.forEach {
+                        if (it != PackageManager.PERMISSION_GRANTED){
+                            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                            return
+                        }
+                    }
+                    openCamera()
+                }
+            }
+        }
+    }
+
 
     fun sendBtnClicked(view: View) {
 
@@ -233,7 +305,17 @@ class ChatLogActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
 
         val chatMessage =
-            ChatMessage(ref.key!!, text, fromId, toId, SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Calendar.getInstance().time), false)
+            ChatMessage(
+                ref.key!!,
+                text,
+                fromId,
+                toId,
+                SimpleDateFormat(
+                    "dd/MM/yyyy HH:mm",
+                    Locale.getDefault()
+                ).format(Calendar.getInstance().time),
+                false
+            )
 
         ref.setValue(chatMessage).addOnSuccessListener {
             Log.d(TAG, "Saved our chat from-message: ${ref.key}")

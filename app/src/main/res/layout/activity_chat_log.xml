@@ -16,9 +16,9 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_textview"
         android:ems="10"
+        android:gravity="center"
         android:hint="Enter Message"
         android:inputType="textMultiLine"
-        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sendBtnChatLog"
         app:layout_constraintStart_toStartOf="parent" />
@@ -63,8 +63,6 @@
         android:padding="5dp"
         app:layout_constraintBottom_toTopOf="@+id/sendBtnChatLog"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_menu_gallery" />
 
     <ProgressBar
@@ -76,6 +74,21 @@
         app:layout_constraintBottom_toBottomOf="@+id/recyclerViewChatLog"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/openCameraChatLog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/rounded_button"
+        android:onClick="openCameraClicked"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/sendBtnChatLog"
+        app:layout_constraintEnd_toStartOf="@+id/pickImageChatLog"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_menu_camera" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
