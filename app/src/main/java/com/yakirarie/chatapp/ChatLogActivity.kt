@@ -107,7 +107,6 @@ class ChatLogActivity : AppCompatActivity() {
 
                 if (chatMessage != null) {
                     if (chatMessage.fromId == fromId) {
-                        Log.d(TAG, "ma ze hazain haze" + chatMessage.image.toString())
                         adapter.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
                     } else {
                         adapter.add(ChatToItem(chatMessage, toUser))

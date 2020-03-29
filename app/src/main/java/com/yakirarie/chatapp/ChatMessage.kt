@@ -1,7 +1,5 @@
 package com.yakirarie.chatapp
 
-import java.util.*
-
 
 class ChatMessage(
     val id: String,

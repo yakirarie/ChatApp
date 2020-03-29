@@ -21,9 +21,15 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
             Glide.with(viewHolder.itemView.context).load(chatMessage.text).diskCacheStrategy(
                 DiskCacheStrategy.ALL
             ).into(viewHolder.itemView.sendImageFromRow)
-        } else
+        } else {
+
+            viewHolder.itemView.sendImageFromRow.visibility = View.GONE
+            viewHolder.itemView.textViewFromRow.visibility = View.VISIBLE
             viewHolder.itemView.textViewFromRow.text = chatMessage.text
 
+        }
+
+        viewHolder.itemView.textViewFromRow.text = chatMessage.text
         val timeAndDate = chatMessage.timestamp.split(" ")
         viewHolder.itemView.timestampFromRow.text = "${timeAndDate[1]}\n${timeAndDate[0]}"
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl).diskCacheStrategy(
