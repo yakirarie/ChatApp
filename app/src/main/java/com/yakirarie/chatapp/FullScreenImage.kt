@@ -1,5 +1,6 @@
 package com.yakirarie.chatapp
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bumptech.glide.Glide
@@ -13,12 +14,22 @@ class FullScreenImage : AppCompatActivity() {
         setContentView(R.layout.activity_full_screen_image)
 
         val url = intent.getStringExtra("image_url")
-        val username = intent.getStringExtra("user_name")
-        supportActionBar?.title = "Image From $username"
-        Glide.with(this).load(url)
-            .placeholder(R.drawable.ic_loading_sign)
-            .error(R.drawable.ic_error_sign)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .into(imageView);
+        if (url != null) {
+            Glide.with(this).load(url)
+                .placeholder(R.drawable.ic_loading_sign)
+                .error(R.drawable.ic_error_sign)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imageView)
+        }
+        else{
+            val uri = intent.getParcelableExtra<Uri>("image_uri")
+            if (uri != null)
+                Glide.with(this).load(uri)
+                    .placeholder(R.drawable.ic_loading_sign)
+                    .error(R.drawable.ic_error_sign)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(imageView)
+        }
+
     }
 }

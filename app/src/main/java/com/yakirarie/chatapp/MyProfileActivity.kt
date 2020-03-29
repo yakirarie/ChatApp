@@ -65,6 +65,17 @@ class MyProfileActivity : AppCompatActivity() {
         customDialog.show(supportFragmentManager, "custom dialog")
     }
 
+    fun viewImageFullScreen(view: View){
+        if (currentUser == null) return
+        val intent = Intent(this, FullScreenImage::class.java)
+        if (selectedPhotoUri != null)
+            intent.putExtra("image_uri", selectedPhotoUri)
+        else
+            intent.putExtra("image_url", currentUser!!.profileImageUrl)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
     fun changePhotoClicked(view: View) {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"

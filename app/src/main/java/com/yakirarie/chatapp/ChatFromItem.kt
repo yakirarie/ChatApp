@@ -27,7 +27,6 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
             viewHolder.itemView.sendImageFromRow.setOnClickListener {
                 val intent = Intent(viewHolder.itemView.context, FullScreenImage::class.java)
                 intent.putExtra("image_url", chatMessage.text)
-                intent.putExtra("user_name",user.username)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 viewHolder.itemView.context.startActivity(intent)
             }
@@ -47,5 +46,12 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
             .error(R.drawable.ic_error_sign).diskCacheStrategy(
                 DiskCacheStrategy.ALL
             ).into(viewHolder.itemView.imageViewFromRow)
+
+        viewHolder.itemView.imageViewFromRow.setOnClickListener {
+            val intent = Intent(viewHolder.itemView.context, FullScreenImage::class.java)
+            intent.putExtra("image_url", user.profileImageUrl)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            viewHolder.itemView.context.startActivity(intent)
+        }
     }
 }

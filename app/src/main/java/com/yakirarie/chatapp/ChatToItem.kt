@@ -23,10 +23,10 @@ class ChatToItem(val chatMessage: ChatMessage, val user: User) : Item<GroupieVie
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
                     DiskCacheStrategy.ALL
                 ).into(viewHolder.itemView.sendImageToRow)
+
             viewHolder.itemView.sendImageToRow.setOnClickListener {
                 val intent = Intent(viewHolder.itemView.context, FullScreenImage::class.java)
                 intent.putExtra("image_url", chatMessage.text)
-                intent.putExtra("user_name",user.username)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 viewHolder.itemView.context.startActivity(intent)
             }
@@ -35,6 +35,7 @@ class ChatToItem(val chatMessage: ChatMessage, val user: User) : Item<GroupieVie
             viewHolder.itemView.textViewToRow.visibility = View.VISIBLE
             viewHolder.itemView.textViewToRow.text = chatMessage.text
         }
+
         val timeAndDate = chatMessage.timestamp.split(" ")
         viewHolder.itemView.timestampToRow.text = "${timeAndDate[1]}\n${timeAndDate[0]}"
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)
@@ -43,6 +44,12 @@ class ChatToItem(val chatMessage: ChatMessage, val user: User) : Item<GroupieVie
                 DiskCacheStrategy.ALL
             ).into(viewHolder.itemView.imageViewToRow)
 
+        viewHolder.itemView.imageViewToRow.setOnClickListener {
+            val intent = Intent(viewHolder.itemView.context, FullScreenImage::class.java)
+            intent.putExtra("image_url", user.profileImageUrl)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            viewHolder.itemView.context.startActivity(intent)
+        }
 
     }
 

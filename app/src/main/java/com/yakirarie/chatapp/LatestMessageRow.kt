@@ -1,5 +1,6 @@
 package com.yakirarie.chatapp
 
+import android.content.Intent
 import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -48,12 +49,20 @@ class LatestMessageRow(val chatMessage: ChatMessage) : Item<GroupieViewHolder>()
 
             override fun onDataChange(p0: DataSnapshot) {
                 chatPartnerUser = p0.getValue(User::class.java)
+
                 viewHolder.itemView.textViewLatestUsername.text = chatPartnerUser?.username
                 Glide.with(viewHolder.itemView.context).load(chatPartnerUser?.profileImageUrl)
                     .placeholder(R.drawable.ic_loading_sign)
                     .error(R.drawable.ic_error_sign).diskCacheStrategy(
                         DiskCacheStrategy.ALL
                     ).into(viewHolder.itemView.imageViewLatestProfile)
+
+                viewHolder.itemView.imageViewLatestProfile.setOnClickListener {
+                    val intent = Intent(viewHolder.itemView.context, FullScreenImage::class.java)
+                    intent.putExtra("image_url", chatPartnerUser?.profileImageUrl)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    viewHolder.itemView.context.startActivity(intent)
+                }
 
             }
 
