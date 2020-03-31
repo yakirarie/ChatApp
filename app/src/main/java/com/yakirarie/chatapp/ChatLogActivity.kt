@@ -10,9 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.view.Menu
 import android.view.View
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -20,10 +18,10 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_chat_log.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ChatLogActivity : AppCompatActivity() {
@@ -31,7 +29,8 @@ class ChatLogActivity : AppCompatActivity() {
     private val TAG = "ChatLogActivityDebug"
 
     companion object {
-        lateinit var toUser: User
+        var toUser: User? = null
+        var toGroup: Group? = null
     }
 
     val adapter = GroupAdapter<GroupieViewHolder>()
@@ -48,8 +47,11 @@ class ChatLogActivity : AppCompatActivity() {
         initPlayer()
         recyclerViewChatLog.adapter = adapter
         toUser = intent.getParcelableExtra(NewMessageActivity.USER_KEY)
-        supportActionBar?.title = toUser.username
-
+        toGroup = intent.getParcelableExtra(NewMessageActivity.GROUP_KEY)
+        if (toUser != null)
+            supportActionBar?.title = toUser!!.username
+        else if (toGroup != null)
+            supportActionBar?.title = toGroup!!.groupName
         listenForMessages()
     }
 
@@ -84,10 +86,24 @@ class ChatLogActivity : AppCompatActivity() {
 
 
     private fun listenForMessages() {
-        Log.d(TAG, MainActivity.currentUser!!.token)
-        val fromId = FirebaseAuth.getInstance().uid
-        val toId = toUser.uid
+        val fromId = FirebaseAuth.getInstance().uid ?: return
+        val toId = toUser?.uid
+        val toIds = toGroup?.usersList?.filter {
+            it.uid != fromId
+        }
 
+        if (toId != null) {
+           handleTwoUsersChat(fromId, toId)
+        }
+
+        else if (toIds != null){
+          handleGroupChat(fromId, toIds as ArrayList<User>)
+        }
+
+
+    }
+
+    private fun handleTwoUsersChat(fromId: String,toId: String){
         val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -119,7 +135,7 @@ class ChatLogActivity : AppCompatActivity() {
                             freezeGui(false)
 
                     } else {
-                        adapter.add(ChatToItem(chatMessage, toUser))
+                        adapter.add(ChatToItem(chatMessage, toUser!!))
 
                         if (numberOfOldMessages != null) {
                             if (adapter.itemCount > numberOfOldMessages!!)
@@ -137,7 +153,58 @@ class ChatLogActivity : AppCompatActivity() {
             }
 
         })
+    }
 
+    private fun handleGroupChat(fromId: String, toIds: ArrayList<User>){
+        val ref = FirebaseDatabase.getInstance().getReference("/group-messages/${toGroup!!.uid}")
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                numberOfOldMessages = p0.childrenCount.toInt()
+            }
+
+        })
+        ref.addChildEventListener(object : ChildEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+            }
+
+            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+                val chatMessage =
+                    p0.getValue(ChatMessage::class.java)
+
+                if (chatMessage != null) {
+                    if (chatMessage.fromId == fromId) {
+                        adapter.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
+                        if (chatMessage.messageType != "text")
+                            freezeGui(false)
+
+                    } else {
+                        adapter.add(ChatToItem(chatMessage, toIds.find { it.uid == chatMessage.fromId }!!))
+
+                        if (numberOfOldMessages != null) {
+                            if (adapter.itemCount > numberOfOldMessages!!)
+                                playMessageSound()
+                        }
+
+                    }
+                }
+
+                recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
+
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+            }
+
+        })
     }
 
     private fun freezeGui(toFreeze: Boolean) {
@@ -153,6 +220,7 @@ class ChatLogActivity : AppCompatActivity() {
     }
 
     fun sendImageClicked(view: View) {
+        if (toGroup != null) return
         freezeGui(true)
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         intent.type = "image/* video/*"
@@ -214,53 +282,86 @@ class ChatLogActivity : AppCompatActivity() {
             text = media
 
         val fromId = FirebaseAuth.getInstance().uid ?: return
-        val toId = toUser.uid
+        if (toUser != null){
+            val toId = toUser!!.uid
 
-        val ref =
-            FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
-        val toRef =
-            FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
-        val latestMessagesRef =
-            FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
-        val latestMessagesToRef =
-            FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
+            val ref =
+                FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
+            val toRef =
+                FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
+            val latestMessagesRef =
+                FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
+            val latestMessagesToRef =
+                FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
 
-        val chatMessage =
-            ChatMessage(
-                ref.key!!,
-                text,
-                fromId,
-                toId,
-                SimpleDateFormat(
-                    "dd/MM/yyyy HH:mm",
-                    Locale.getDefault()
-                ).format(Calendar.getInstance().time),
-                messageType
-            )
+            val chatMessage =
+                ChatMessage(
+                    ref.key!!,
+                    text,
+                    fromId,
+                    mutableListOf(toId),
+                    SimpleDateFormat(
+                        "dd/MM/yyyy HH:mm",
+                        Locale.getDefault()
+                    ).format(Calendar.getInstance().time),
+                    messageType
+                )
 
-        ref.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat from-message: ${ref.key}")
-            if (chatMessage.messageType == "text")
-                editTextChatLog.text.clear()
-            recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
+            ref.setValue(chatMessage).addOnSuccessListener {
+                Log.d(TAG, "Saved our chat from-message: ${ref.key}")
+                if (chatMessage.messageType == "text")
+                    editTextChatLog.text.clear()
+                recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
+            }
+
+            toRef.setValue(chatMessage).addOnSuccessListener {
+                Log.d(TAG, "Saved our chat to-message: ${toRef.key}")
+            }
+
+            latestMessagesRef.setValue(chatMessage).addOnSuccessListener {
+                Log.d(TAG, "Saved our chat latest-from-message: ${latestMessagesRef.key}")
+            }
+
+            latestMessagesToRef.setValue(chatMessage).addOnSuccessListener {
+                Log.d(TAG, "Saved our chat latest-to-message: ${latestMessagesToRef.key}")
+            }
         }
 
-        toRef.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat to-message: ${toRef.key}")
+        else if (toGroup != null){
+            val toIds = ArrayList<String>()
+            toGroup!!.usersList.forEach {
+                if (it.uid != FirebaseAuth.getInstance().uid)
+                    toIds.add(it.uid)
+            }
+            val ref =
+                FirebaseDatabase.getInstance().getReference("/group-messages/${toGroup!!.uid}").push()
+            val chatMessage =
+                ChatMessage(
+                    ref.key!!,
+                    text,
+                    fromId,
+                    toIds,
+                    SimpleDateFormat(
+                        "dd/MM/yyyy HH:mm",
+                        Locale.getDefault()
+                    ).format(Calendar.getInstance().time),
+                    messageType
+                )
+
+            ref.setValue(chatMessage).addOnSuccessListener {
+                Log.d(TAG, "Saved our chat from-message: ${ref.key}")
+                if (chatMessage.messageType == "text")
+                    editTextChatLog.text.clear()
+                recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
+            }
         }
 
-        latestMessagesRef.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat latest-from-message: ${latestMessagesRef.key}")
-        }
-
-        latestMessagesToRef.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat latest-to-message: ${latestMessagesToRef.key}")
-        }
 
     }
 
 
     fun openCameraClicked(view: View) {
+        if (toGroup != null) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || checkSelfPermission(
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE

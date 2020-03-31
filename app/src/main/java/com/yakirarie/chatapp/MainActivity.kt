@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -47,7 +46,7 @@ class MainActivity : AppCompatActivity() {
             val row = item as LatestMessageRow
             if (row.chatPartnerUser == null)
                 if (row.chatMessage.fromId == FirebaseAuth.getInstance().uid)
-                    removeDeletedUserInteractionsWithYou(row.chatMessage.toId)
+                    removeDeletedUserInteractionsWithYou(row.chatMessage.toId[0])
                 else
                     removeDeletedUserInteractionsWithYou(row.chatMessage.fromId)
             else {
@@ -240,6 +239,15 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.menu_user_profile -> {
                 val intent = Intent(this, MyProfileActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.menu_create_group -> {
+                if (currentUser == null){
+                    Toast.makeText(this, "Couldn't load your details, please try again", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                val intent = Intent(this, ChooseUserForGroupActivity::class.java)
+                intent.putExtra(MainActivity.CURRENT_USER, currentUser)
                 startActivity(intent)
             }
         }

@@ -31,7 +31,7 @@ class LatestMessageRow(val chatMessage: ChatMessage) : Item<GroupieViewHolder>()
         }
 
         val chatPartnerId: String = if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-            chatMessage.toId
+            chatMessage.toId[0]
         } else
             chatMessage.fromId
 

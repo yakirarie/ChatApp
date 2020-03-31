@@ -7,12 +7,14 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.user_row_message.view.*
 
-class UserItem(val user: User?) : Item<GroupieViewHolder>() {
+class UserItemCreateGroup(val user: User?, private val chosenUsers: ArrayList<String>) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.user_row_message
+        return R.layout.user_create_group
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        if (chosenUsers.size != 0 && chosenUsers.contains(user!!.uid))
+            viewHolder.itemView.background = viewHolder.itemView.resources.getDrawable(R.drawable.gradient_chosen, null)
         viewHolder.itemView.textViewNewMessageUsername.text = user!!.username
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)
             .placeholder(R.drawable.ic_loading_sign)

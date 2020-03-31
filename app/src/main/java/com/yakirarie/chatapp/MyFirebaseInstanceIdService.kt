@@ -77,7 +77,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
 
 
         if (currentActivity == ".ChatLogActivity") {
-            if (senderUser!!.uid == ChatLogActivity.toUser.uid) {
+            if (senderUser!!.uid == ChatLogActivity.toUser!!.uid) {
                 return
             }
         }

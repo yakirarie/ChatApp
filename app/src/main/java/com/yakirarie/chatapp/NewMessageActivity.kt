@@ -22,11 +22,12 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     companion object {
         val USER_KEY = "USER_KEY"
+        val GROUP_KEY = "GROUP_KEY"
     }
 
     val adapter = GroupAdapter<GroupieViewHolder>()
-    val usersMap = HashMap<String, User>()
-    val usersList = mutableListOf<UserItem>()
+    val usersMap = HashMap<String, Any>()
+    val usersList = mutableListOf<DataItem>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,15 +42,17 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             )
         )
         adapter.setOnItemClickListener { item, view ->
-            val userItem = item as UserItem
-            if (userItem.user == null)
-                removeDeletedUser(userItem.user!!.uid)
-            else {
-                val intent = Intent(view.context, ChatLogActivity::class.java)
-                intent.putExtra(USER_KEY, userItem.user)
+            val dataItem = item as DataItem
+            val intent = Intent(view.context, ChatLogActivity::class.java)
+            if (dataItem.data is User) {
+                intent.putExtra(USER_KEY, dataItem.data)
+                startActivity(intent)
+            } else if (dataItem.data is Group){
+                intent.putExtra(GROUP_KEY, dataItem.data)
                 startActivity(intent)
             }
         }
+
         fetchUsers()
     }
 
@@ -57,23 +60,11 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         adapter.clear()
         usersList.clear()
         usersMap.values.forEach {
-            adapter.add(UserItem(it))
-            usersList.add(UserItem(it))
+            adapter.add(DataItem(it))
+            usersList.add(DataItem(it))
         }
     }
 
-    private fun removeDeletedUser(deletedId: String) {
-        val ref = FirebaseDatabase.getInstance().getReference("user/$deletedId")
-        ref.removeValue().addOnSuccessListener {
-            Log.d(TAG, "user $deletedId deleted from users")
-            Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
-
-        }.addOnFailureListener {
-
-            Log.e(TAG, "Failed to delete user: ${it.message}")
-
-        }
-    }
 
     private fun fetchUsers() {
         val ref = FirebaseDatabase.getInstance().getReference("users")
@@ -85,21 +76,33 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-
-                val user = p0.getValue(User::class.java) ?: return
-                if (user.uid != FirebaseAuth.getInstance().uid) {
-                    usersMap[p0.key!!] = user
-                    refreshRecyclerUsers()
+                val data: Any
+                if (p0.child("groupName").exists()) {
+                    data = p0.getValue(Group::class.java) ?: return
+                    usersMap[p0.key!!] = data
+                } else {
+                    data = p0.getValue(User::class.java) ?: return
+                    if (data.uid != FirebaseAuth.getInstance().uid)
+                        usersMap[p0.key!!] = data
                 }
+
+                refreshRecyclerUsers()
 
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                val user = p0.getValue(User::class.java) ?: return
-                if (user.uid != FirebaseAuth.getInstance().uid) {
-                    usersMap[p0.key!!] = user
-                    refreshRecyclerUsers()
+                val data: Any
+                if (p0.child("groupName").exists()) {
+                    data = p0.getValue(Group::class.java) ?: return
+                    usersMap[p0.key!!] = data
+                } else {
+                    data = p0.getValue(User::class.java) ?: return
+                    if (data.uid != FirebaseAuth.getInstance().uid)
+                        usersMap[p0.key!!] = data
                 }
+
+                refreshRecyclerUsers()
+
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {
@@ -132,10 +135,16 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     override fun onQueryTextChange(p0: String?): Boolean {
         if (p0 == null) return false
         val userInput = p0.toLowerCase(Locale.ROOT)
-        val newList = mutableListOf<UserItem>()
+        val newList = mutableListOf<DataItem>()
         for (userItem in usersList) {
-            if (userItem.user!!.username.toLowerCase(Locale.ROOT).startsWith(userInput)) {
-                newList.add(userItem)
+            if (userItem.data is User) {
+                if (userItem.data.username.toLowerCase(Locale.ROOT).startsWith(userInput)) {
+                    newList.add(userItem)
+                }
+            } else if (userItem.data is Group) {
+                if (userItem.data.groupName.toLowerCase(Locale.ROOT).startsWith(userInput)) {
+                    newList.add(userItem)
+                }
             }
         }
         adapter.update(newList)
