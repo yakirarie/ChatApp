@@ -115,7 +115,8 @@ class ChatLogActivity : AppCompatActivity() {
                 if (chatMessage != null) {
                     if (chatMessage.fromId == fromId) {
                         adapter.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
-                        freezeGui(false)
+                        if (chatMessage.messageType != "text")
+                            freezeGui(false)
 
                     } else {
                         adapter.add(ChatToItem(chatMessage, toUser))

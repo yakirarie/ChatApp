@@ -25,6 +25,8 @@
             android:layout_height="90dp"
             android:background="@drawable/image_background"
             android:alpha="0.6"
+            android:scaleType="centerCrop"
+
             android:visibility="gone"
              />
 
