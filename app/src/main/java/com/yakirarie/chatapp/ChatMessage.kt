@@ -7,7 +7,7 @@ class ChatMessage(
     val fromId: String,
     val toId: String,
     val timestamp: String,
-    val image: Boolean
+    val messageType: String
 ) {
-    constructor() : this("", "", "", "", "", false)
+    constructor() : this("", "", "", "", "", "")
 }

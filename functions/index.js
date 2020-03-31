@@ -51,9 +51,14 @@ exports.newMessage = functions.database.ref('/latest-messages/{id1}/{id2}')
 
         };
 
-        if (chatMessage.image) {
+        if (chatMessage.messageType === "image") {
             payload.notification.body = "";
             payload.notification.image = messageText;
+        }
+
+        if (chatMessage.messageType === "video") {
+            payload.notification.body = "🎥 video file 🎥";
+
         }
         try {
             const response = await admin.messaging().sendToDevice(recieverUser.token, payload);

@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_new_message.*
 import java.util.*
 import kotlin.collections.HashMap
 
-class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
+class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private val TAG = "NewMessageActivityDebug"
 
@@ -133,8 +133,8 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
         if (p0 == null) return false
         val userInput = p0.toLowerCase(Locale.ROOT)
         val newList = mutableListOf<UserItem>()
-        for (userItem in usersList){
-            if (userItem.user!!.username.toLowerCase(Locale.ROOT).contains(userInput)){
+        for (userItem in usersList) {
+            if (userItem.user!!.username.toLowerCase(Locale.ROOT).startsWith(userInput)) {
                 newList.add(userItem)
             }
         }

@@ -1,6 +1,7 @@
 package com.yakirarie.chatapp
 
 import android.content.Intent
+import android.net.Uri
 import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -21,19 +22,12 @@ class LatestMessageRow(val chatMessage: ChatMessage) : Item<GroupieViewHolder>()
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        if (chatMessage.image) {
-            viewHolder.itemView.sendImageLatestMessage.visibility = View.VISIBLE
-            viewHolder.itemView.textViewLatestMessage.visibility = View.GONE
-            Glide.with(viewHolder.itemView.context).load(chatMessage.text)
-                .placeholder(R.drawable.ic_loading_sign)
-                .error(R.drawable.ic_error_sign).diskCacheStrategy(
-                    DiskCacheStrategy.ALL
-                ).into(viewHolder.itemView.sendImageLatestMessage)
-
+        if (chatMessage.messageType == "image") {
+            handleImageMessage(viewHolder)
+        } else if (chatMessage.messageType == "video") {
+            handleVideoMessage(viewHolder)
         } else {
-            viewHolder.itemView.sendImageLatestMessage.visibility = View.GONE
-            viewHolder.itemView.textViewLatestMessage.visibility = View.VISIBLE
-            viewHolder.itemView.textViewLatestMessage.text = chatMessage.text
+            handleTextMessage(viewHolder)
         }
 
         val chatPartnerId: String = if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
@@ -58,8 +52,10 @@ class LatestMessageRow(val chatMessage: ChatMessage) : Item<GroupieViewHolder>()
                     ).into(viewHolder.itemView.imageViewLatestProfile)
 
                 viewHolder.itemView.imageViewLatestProfile.setOnClickListener {
-                    val intent = Intent(viewHolder.itemView.context, FullScreenImage::class.java)
+                    val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
                     intent.putExtra("image_url", chatPartnerUser?.profileImageUrl)
+                    intent.putExtra("media_type", "image")
+
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     viewHolder.itemView.context.startActivity(intent)
                 }
@@ -67,6 +63,43 @@ class LatestMessageRow(val chatMessage: ChatMessage) : Item<GroupieViewHolder>()
             }
 
         })
+    }
+
+    private fun handleImageMessage(viewHolder: GroupieViewHolder) {
+        viewHolder.itemView.sendImageLatestMessage.visibility = View.VISIBLE
+        viewHolder.itemView.sendVideoLatestMessageThumbnail.visibility = View.GONE
+        viewHolder.itemView.frameLayoutLatestMessage.visibility = View.GONE
+        viewHolder.itemView.videoPreviewPlayButtonLatestMessage.visibility = View.GONE
+        viewHolder.itemView.textViewLatestMessage.visibility = View.GONE
+        Glide.with(viewHolder.itemView.context).load(chatMessage.text)
+            .placeholder(R.drawable.ic_loading_sign)
+            .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                DiskCacheStrategy.ALL
+            ).into(viewHolder.itemView.sendImageLatestMessage)
+    }
+
+    private fun handleVideoMessage(viewHolder: GroupieViewHolder) {
+        viewHolder.itemView.sendVideoLatestMessageThumbnail.visibility = View.VISIBLE
+        viewHolder.itemView.frameLayoutLatestMessage.visibility = View.VISIBLE
+        viewHolder.itemView.videoPreviewPlayButtonLatestMessage.visibility = View.VISIBLE
+        viewHolder.itemView.sendImageLatestMessage.visibility = View.GONE
+        viewHolder.itemView.textViewLatestMessage.visibility = View.GONE
+
+        Glide.with(viewHolder.itemView.context).load(chatMessage.text)
+            .thumbnail(0.1f)
+            .placeholder(R.drawable.ic_loading_sign)
+            .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                DiskCacheStrategy.ALL
+            ).into(viewHolder.itemView.sendVideoLatestMessageThumbnail)
+    }
+
+    private fun handleTextMessage(viewHolder: GroupieViewHolder){
+        viewHolder.itemView.frameLayoutLatestMessage.visibility = View.GONE
+        viewHolder.itemView.videoPreviewPlayButtonLatestMessage.visibility = View.GONE
+        viewHolder.itemView.sendImageLatestMessage.visibility = View.GONE
+        viewHolder.itemView.sendVideoLatestMessageThumbnail.visibility = View.GONE
+        viewHolder.itemView.textViewLatestMessage.visibility = View.VISIBLE
+        viewHolder.itemView.textViewLatestMessage.text = chatMessage.text
     }
 
 }

@@ -31,9 +31,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
 
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d("TAG", remoteMessage.notification.toString())
         val params = remoteMessage.data
-        Log.d("TAG", params.toString())
 
         senderUser = User(
             params["sender_id"]!!,
@@ -47,7 +45,6 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             params["receiver_img"]!!,
             params["receiver_token"]!!
         )
-        Log.d("PARAMS", currentUser?.username ?: "kaki")
 
         val NOTIFICATION_CHANNEL_ID = "channel"
         val pattern = longArrayOf(0, 1000, 500, 1000)

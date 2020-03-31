@@ -21,7 +21,7 @@ class UserItem(val user: User?) : Item<GroupieViewHolder>() {
             ).into(viewHolder.itemView.imageViewNewMessage)
 
         viewHolder.itemView.imageViewNewMessage.setOnClickListener {
-            val intent = Intent(viewHolder.itemView.context, FullScreenImage::class.java)
+            val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
             intent.putExtra("image_url", user.profileImageUrl)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             viewHolder.itemView.context.startActivity(intent)

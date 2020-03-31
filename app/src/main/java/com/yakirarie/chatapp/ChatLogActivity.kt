@@ -156,7 +156,7 @@ class ChatLogActivity : AppCompatActivity() {
     fun sendImageClicked(view: View) {
         freezeGui(true)
         val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
+        intent.type = "image/* video/*"
         startActivityForResult(intent, 0)
     }
 
@@ -166,7 +166,6 @@ class ChatLogActivity : AppCompatActivity() {
             val selectedPhotoUri = data.data
             uploadImageToFirebaseStorage(selectedPhotoUri!!)
         } else if (requestCode == IMAGE_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
-            Log.d("IMAGE","image uri ${imageUri.toString()}")
             uploadImageToFirebaseStorage(imageUri!!)
         } else {
             freezeGui(false)
@@ -175,15 +174,25 @@ class ChatLogActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebaseStorage(selectedPhotoUri: Uri) {
+        val messageType = when {
+            selectedPhotoUri.toString().contains("image") -> {
+                "image"
+            }
+            selectedPhotoUri.toString().contains("video") -> {
+                "video"
+            }
+            else -> "text"
+        }
         val filename = UUID.randomUUID().toString()
         val uid = FirebaseAuth.getInstance().uid
+
         val ref = FirebaseStorage.getInstance().getReference("/imagesMessages/$uid/$filename")
 
         ref.putFile(selectedPhotoUri).addOnSuccessListener {
             Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
             ref.downloadUrl.addOnSuccessListener {
                 Log.d(TAG, "File location: $it")
-                sendImageMessage(it.toString())
+                sendMessage(it.toString(), messageType)
             }
         }.addOnFailureListener {
             Log.d(TAG, "Failed to upload Image: ${it.message}")
@@ -194,7 +203,16 @@ class ChatLogActivity : AppCompatActivity() {
 
     }
 
-    private fun sendImageMessage(image: String) {
+    private fun sendMessage(media: String? = null, messageType: String) {
+        val text: String
+        if (media == null) {
+            text = editTextChatLog.text.trim().toString()
+            if (text.isEmpty()) return
+        }
+
+        else
+            text = media
+
         val fromId = FirebaseAuth.getInstance().uid ?: return
         val toId = toUser.uid
 
@@ -210,14 +228,14 @@ class ChatLogActivity : AppCompatActivity() {
         val chatMessage =
             ChatMessage(
                 ref.key!!,
-                image,
+                text,
                 fromId,
                 toId,
                 SimpleDateFormat(
                     "dd/MM/yyyy HH:mm",
                     Locale.getDefault()
                 ).format(Calendar.getInstance().time),
-                true
+                messageType
             )
 
         ref.setValue(chatMessage).addOnSuccessListener {
@@ -295,52 +313,7 @@ class ChatLogActivity : AppCompatActivity() {
 
 
     fun sendBtnClicked(view: View) {
-
-        val text = editTextChatLog.text.trim().toString()
-        if (text.isEmpty()) return
-
-        val fromId = FirebaseAuth.getInstance().uid ?: return
-        val toId = toUser.uid
-
-        val ref =
-            FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
-        val toRef =
-            FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
-        val latestMessagesRef =
-            FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
-        val latestMessagesToRef =
-            FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
-
-        val chatMessage =
-            ChatMessage(
-                ref.key!!,
-                text,
-                fromId,
-                toId,
-                SimpleDateFormat(
-                    "dd/MM/yyyy HH:mm",
-                    Locale.getDefault()
-                ).format(Calendar.getInstance().time),
-                false
-            )
-
-        ref.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat from-message: ${ref.key}")
-            editTextChatLog.text.clear()
-            recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
-        }
-
-        toRef.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat to-message: ${toRef.key}")
-        }
-
-        latestMessagesRef.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat latest-from-message: ${latestMessagesRef.key}")
-        }
-
-        latestMessagesToRef.setValue(chatMessage).addOnSuccessListener {
-            Log.d(TAG, "Saved our chat latest-to-message: ${latestMessagesToRef.key}")
-        }
+        sendMessage(messageType = "text")
 
     }
 

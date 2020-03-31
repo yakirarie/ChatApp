@@ -12,9 +12,46 @@
         android:layout_height="170dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="40dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/image_background"
         android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/timestampToRow"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/frameLayoutToRow"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="40dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/timestampToRow"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <ImageView
+            android:id="@+id/sendVideoToRowThumbnail"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/image_background"
+            android:alpha="0.6"
+            android:visibility="gone"
+            />
+
+        <ImageView
+            android:id="@+id/videoPreviewPlayButtonToRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:visibility="gone"
+            android:background="@drawable/thumbnail_background"
+            android:layout_gravity="center_horizontal|center"
+            android:src="@drawable/ic_video_icon" />
+
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/textViewToRow"

@@ -67,11 +67,15 @@ class MyProfileActivity : AppCompatActivity() {
 
     fun viewImageFullScreen(view: View){
         if (currentUser == null) return
-        val intent = Intent(this, FullScreenImage::class.java)
-        if (selectedPhotoUri != null)
+        val intent = Intent(this, FullScreenMedia::class.java)
+        if (selectedPhotoUri != null) {
             intent.putExtra("image_uri", selectedPhotoUri)
-        else
+            intent.putExtra("media_type", "image")
+        }
+        else {
             intent.putExtra("image_url", currentUser!!.profileImageUrl)
+            intent.putExtra("media_type", "image")
+        }
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }
