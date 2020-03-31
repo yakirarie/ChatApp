@@ -142,12 +142,10 @@ class ChatLogActivity : AppCompatActivity() {
     private fun freezeGui(toFreeze: Boolean) {
         if (toFreeze) {
             progressBarChatLog.visibility = View.VISIBLE
-            sendBtnChatLog.isClickable = false
             pickImageChatLog.isClickable = false
             openCameraChatLog.isClickable = false
         } else {
             progressBarChatLog.visibility = View.GONE
-            sendBtnChatLog.isClickable = true
             pickImageChatLog.isClickable = true
             openCameraChatLog.isClickable = true
         }
@@ -240,7 +238,8 @@ class ChatLogActivity : AppCompatActivity() {
 
         ref.setValue(chatMessage).addOnSuccessListener {
             Log.d(TAG, "Saved our chat from-message: ${ref.key}")
-            editTextChatLog.text.clear()
+            if (chatMessage.messageType == "text")
+                editTextChatLog.text.clear()
             recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
         }
 
