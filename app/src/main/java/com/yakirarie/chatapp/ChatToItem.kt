@@ -1,7 +1,6 @@
 package com.yakirarie.chatapp
 
 import android.content.Intent
-import android.net.Uri
 import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -58,7 +57,7 @@ class ChatToItem(private val chatMessage: ChatMessage, val user: User) : Item<Gr
                 DiskCacheStrategy.ALL
             ).into(viewHolder.itemView.sendImageToRow)
 
-        viewHolder.itemView.videoPreviewPlayButtonToRow.setOnClickListener {
+        viewHolder.itemView.sendImageToRow.setOnClickListener {
             val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
             intent.putExtra("image_url", chatMessage.text)
             intent.putExtra("media_type", chatMessage.messageType)

@@ -154,7 +154,7 @@ class ChatLogActivity : AppCompatActivity() {
 
     fun sendImageClicked(view: View) {
         freezeGui(true)
-        val intent = Intent(Intent.ACTION_PICK)
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         intent.type = "image/* video/*"
         startActivityForResult(intent, 0)
     }
@@ -173,6 +173,7 @@ class ChatLogActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebaseStorage(selectedPhotoUri: Uri) {
+        Toast.makeText(this, selectedPhotoUri.toString(), Toast.LENGTH_LONG).show()
         val messageType = when {
             selectedPhotoUri.toString().contains("image") -> {
                 "image"
@@ -180,7 +181,7 @@ class ChatLogActivity : AppCompatActivity() {
             selectedPhotoUri.toString().contains("video") -> {
                 "video"
             }
-            else -> "text"
+            else -> "image"
         }
         val filename = UUID.randomUUID().toString()
         val uid = FirebaseAuth.getInstance().uid
