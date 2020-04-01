@@ -126,15 +126,16 @@ class MainActivity : AppCompatActivity() {
         val toGroup = intent.getParcelableExtra<Group>(NewMessageActivity.GROUP_KEY)
 
         if (toUser != null) {  // my notification
+            if (currentUser == null)
+                currentUser = intent.getParcelableExtra(CURRENT_USER)
+            
             val intent = Intent(this, ChatLogActivity::class.java)
 
             if (toGroup != null) // group
                 intent.putExtra(NewMessageActivity.GROUP_KEY, toGroup)
             else  //user
                 intent.putExtra(NewMessageActivity.USER_KEY, toUser)
-                
-            if (currentUser == null)
-                currentUser = intent.getParcelableExtra(CURRENT_USER)
+
 
             startActivity(intent)
 
