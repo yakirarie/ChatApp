@@ -23,6 +23,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
     companion object {
         var senderUser: User? = null
         var currentUser: User? = null
+        var group: Group? = null
     }
 
     override fun onNewToken(s: String) {
@@ -32,6 +33,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         val params = remoteMessage.data
+        Log.d("GroupTest", "remote : ${remoteMessage.data}")
 
         senderUser = User(
             params["sender_id"]!!,
@@ -39,12 +41,26 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             params["sender_img"]!!,
             params["sender_token"]!!
         )
-        currentUser = User(
-            params["receiver_id"]!!,
-            params["receiver_username"]!!,
-            params["receiver_img"]!!,
-            params["receiver_token"]!!
-        )
+        if (params["group_id"] != null) {
+            val usersList = arrayListOf<User>()
+            for (i in 0 until params["group_size"]!!.toInt()){
+                val user = User(params["receiver_id${i+1}"]!!,
+                    params["receiver_username${i+1}"]!!,
+                    params["receiver_img${i+1}"]!!,
+                    params["receiver_token${i+1}"]!!)
+                usersList.add(user)
+            }
+            group = Group(params["group_id"]!!, params["group_name"]!!, params["group_image"]!!, usersList)
+        }
+        else {
+            currentUser = User(
+                params["receiver_id"]!!,
+                params["receiver_username"]!!,
+                params["receiver_img"]!!,
+                params["receiver_token"]!!
+            )
+        }
+
 
         val NOTIFICATION_CHANNEL_ID = "channel"
         val pattern = longArrayOf(0, 1000, 500, 1000)

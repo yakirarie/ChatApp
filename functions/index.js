@@ -12,11 +12,11 @@ admin.initializeApp();
 
 
 // listen to 2 users chat
-exports.newMessage = functions.database.ref('/latest-messages/{id1}/{id2}')
+exports.newMessageTwoUsers = functions.database.ref('/latest-messages/{id1}/{id2}')
     .onWrite(async (change, context) => {
 
         const chatMessage = change.after.val();
-
+        console.log(chatMessage);
         const receiverId = chatMessage.toId[0];
         const senderId = chatMessage.fromId;
         const messageText = chatMessage.text;
@@ -67,25 +67,31 @@ exports.newMessage = functions.database.ref('/latest-messages/{id1}/{id2}')
     });
 
 // listen to group chat
-exports.newMessage = functions.database.ref('/group-messages/{id}')
+exports.newMessageGroup = functions.database.ref('/group-messages/{groupId}/{messageId}')
     .onWrite(async (change, context) => {
 
         const chatMessage = change.after.val();
 
-        const receiversIds = chatMessage.toId;
+        const receiversIds = []
+
+        for (let i = 0; i < chatMessage.toId.length; i++)
+            receiversIds.push(chatMessage.toId[i]);
         const senderId = chatMessage.fromId;
         const messageText = chatMessage.text;
 
 
         const snap = await admin.database().ref("/users/" + senderId).once('value');
         const senderUser = snap.val();
-        const recieversUsers = []
-        for (const reciever of receiversIds){
-            const snap_1 = admin.database().ref("/users/" + reciever).once('value');
-            recieversUsers.push(snap_1.val());
-        }
-        await Promise.all(recieversUsers);
-       
+
+        const snapGroup = await admin.database().ref("/users/" + context.params.groupId).once('value');
+        const group = snapGroup.val();
+
+        // const recieversUsersPromises = []
+        // for (const rec of receiversIds) {
+        //     recieversUsersPromises.push(admin.database().ref("/users/" + rec).once('value'));
+        // }
+        // const recieversUsersSnapshots = await Promise.all(recieversUsersPromises);
+
         const payload = {
 
             notification: {
@@ -96,19 +102,30 @@ exports.newMessage = functions.database.ref('/group-messages/{id}')
                 sender_id: senderUser.uid,
                 sender_username: senderUser.username,
                 sender_img: senderUser.profileImageUrl,
-                sender_token: senderUser.token
+                sender_token: senderUser.token,
+
+                group_id: group.uid,
+                group_name: group.groupName,
+                group_image: group.groupImageUrl,
+                group_size: group.usersList.length.toString()
+
+
             }
 
         };
-        for (let i = 0; i < receiversIds.length ; i++){
-            payload.data[`receiver_id${i+1}`] = receiversIds[i].uid;
-            payload.data[`receiver_username${i+1}`] = receiversIds[i].username;
-            payload.data[`receiver_img${i+1}`] = receiversIds[i].profileImageUrl;
-            payload.data[`receiver_token${i+1}`] = receiversIds[i].token;
-
+        for (let i = 0; i < group.usersList.length; i++) {
+            payload.data[`receiver_id${i+1}`] = group.usersList[i].uid;
+            payload.data[`receiver_username${i+1}`] = group.usersList[i].username;
+            payload.data[`receiver_img${i+1}`] = group.usersList[i].profileImageUrl;
+            payload.data[`receiver_token${i+1}`] = group.usersList[i].token;
         }
-        console.log(payload);
+        // for (let i = 0; i < recieversUsersSnapshots.length; i++) {
+        //     payload.data[`receiver_id${i+1}`] = recieversUsersSnapshots[i].val().uid;
+        //     payload.data[`receiver_username${i+1}`] = recieversUsersSnapshots[i].val().username;
+        //     payload.data[`receiver_img${i+1}`] = recieversUsersSnapshots[i].val().profileImageUrl;
+        //     payload.data[`receiver_token${i+1}`] = recieversUsersSnapshots[i].val().token;
 
+        // }
         // if (chatMessage.messageType === "image") {
         //     payload.notification.body = "";
         //     payload.notification.image = messageText;
@@ -119,9 +136,9 @@ exports.newMessage = functions.database.ref('/group-messages/{id}')
 
         // }
         const responses = []
-        for (const reciever of receiversIds){
+        for (const user of group.usersList) {
             try {
-                const response = admin.messaging().sendToDevice(reciever.token, payload);
+                const response = admin.messaging().sendToDevice(user.token, payload);
                 responses.push(response)
                 return console.log("Successfully sent message:", response);
             } catch (error) {
@@ -129,5 +146,5 @@ exports.newMessage = functions.database.ref('/group-messages/{id}')
             }
         }
         await Promise.all(responses);
-       
+
     });
