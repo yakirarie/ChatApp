@@ -95,7 +95,7 @@ exports.newMessageGroup = functions.database.ref('/group-messages/{groupId}/{mes
         const payload = {
 
             notification: {
-                title: "New Message From " + senderUser.username,
+                title: "New Message From " + senderUser.username + " In " + group.groupName,
                 body: messageText
             },
             data: {

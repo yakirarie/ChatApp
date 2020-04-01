@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Builder
 import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.io.InputStream
@@ -41,18 +42,24 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             params["sender_img"]!!,
             params["sender_token"]!!
         )
-        if (params["group_id"] != null) {
+        if (params["group_id"] != null) { // group msg
             val usersList = arrayListOf<User>()
-            for (i in 0 until params["group_size"]!!.toInt()){
-                val user = User(params["receiver_id${i+1}"]!!,
-                    params["receiver_username${i+1}"]!!,
-                    params["receiver_img${i+1}"]!!,
-                    params["receiver_token${i+1}"]!!)
+            for (i in 0 until params["group_size"]!!.toInt()) {
+                val user = User(
+                    params["receiver_id${i + 1}"]!!,
+                    params["receiver_username${i + 1}"]!!,
+                    params["receiver_img${i + 1}"]!!,
+                    params["receiver_token${i + 1}"]!!
+                )
                 usersList.add(user)
             }
-            group = Group(params["group_id"]!!, params["group_name"]!!, params["group_image"]!!, usersList)
-        }
-        else {
+            group = Group(
+                params["group_id"]!!,
+                params["group_name"]!!,
+                params["group_image"]!!,
+                usersList
+            )
+        } else {  // user to user msg
             currentUser = User(
                 params["receiver_id"]!!,
                 params["receiver_username"]!!,
@@ -93,20 +100,36 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
 
 
         if (currentActivity == ".ChatLogActivity") {
-            if (senderUser!!.uid == ChatLogActivity.toUser!!.uid) {
-                return
+            if (currentUser != null) { // user to user
+                if (ChatLogActivity.toUser != null) { // you are in a user chat
+                    if (senderUser!!.uid == ChatLogActivity.toUser!!.uid) { // you are in the same chat
+                        return
+                    }
+                }
+            } else if (group != null) { // user to group
+                if (ChatLogActivity.toGroup != null) //you are in a group chat
+                    if (group!!.uid == ChatLogActivity.toGroup!!.uid) { // you are in the same group chat
+                        return
+                    }
             }
         }
 
 
         val resultIntent = Intent(this, MainActivity::class.java)
         resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+
         resultIntent.putExtra(NewMessageActivity.USER_KEY, senderUser)
-        resultIntent.putExtra(MainActivity.CURRENT_USER, currentUser)
+        if (currentUser != null)
+            resultIntent.putExtra(MainActivity.CURRENT_USER, currentUser)
+
+        else if (group != null) {
+            resultIntent.putExtra(MainActivity.CURRENT_USER, group!!.usersList.find { it.uid == FirebaseAuth.getInstance().uid })
+            resultIntent.putExtra(NewMessageActivity.GROUP_KEY, group)
+        }
         val resultPendingIntent =
             PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val notificationBuilder: Builder = Builder(this, NOTIFICATION_CHANNEL_ID)
+        val notificationBuilder = Builder(this, NOTIFICATION_CHANNEL_ID)
         var imageBitmap: Bitmap? = null
         if (remoteMessage.notification?.imageUrl != null)
             imageBitmap = getBitmapfromUrl(remoteMessage.notification?.imageUrl.toString())
@@ -121,7 +144,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(resultPendingIntent)
 
-        if(imageBitmap != null)
+        if (imageBitmap != null)
             notificationBuilder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(imageBitmap))
 
         mNotificationManager.notify(1000, notificationBuilder.build())

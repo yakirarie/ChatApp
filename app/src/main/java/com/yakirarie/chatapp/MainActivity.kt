@@ -72,7 +72,8 @@ class MainActivity : AppCompatActivity() {
     private fun removeDeletedUserInteractionsWithYou(deletedId: String) {
         Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
         val uid = FirebaseAuth.getInstance().uid
-        val refLatest = FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
+        val refLatest =
+            FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
         refLatest.removeValue().addOnSuccessListener {
             Log.d(TAG, "user $deletedId deleted from your latest messages")
             Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
@@ -83,7 +84,8 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        val refMessages = FirebaseDatabase.getInstance().getReference("user-messages/$uid/$deletedId")
+        val refMessages =
+            FirebaseDatabase.getInstance().getReference("user-messages/$uid/$deletedId")
         refMessages.removeValue().addOnSuccessListener {
             Log.d(TAG, "user $deletedId deleted from your messages")
 
@@ -121,39 +123,64 @@ class MainActivity : AppCompatActivity() {
 
     private fun receivedNotification() {
         val toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+        val toGroup = intent.getParcelableExtra<Group>(NewMessageActivity.GROUP_KEY)
 
         if (toUser != null) {  // my notification
-            if (currentUser == null) {
+            val intent = Intent(this, ChatLogActivity::class.java)
+
+            if (toGroup != null) // group
+                intent.putExtra(NewMessageActivity.GROUP_KEY, toGroup)
+            else  //user
+                intent.putExtra(NewMessageActivity.USER_KEY, toUser)
+                
+            if (currentUser == null)
                 currentUser = intent.getParcelableExtra(CURRENT_USER)
 
-            }
-            Log.d("USER", toUser.toString())
-
-            val intent = Intent(this, ChatLogActivity::class.java)
-            intent.putExtra(NewMessageActivity.USER_KEY, toUser)
             startActivity(intent)
+
         } else { // firebase notification
             val senderId = intent.getStringExtra("sender_id")
             val senderUsername = intent.getStringExtra("sender_username")
             val senderImg = intent.getStringExtra("sender_img")
             val senderToken = intent.getStringExtra("sender_token")
 
-            val receiverId = intent.getStringExtra("receiver_id")
-            val receiverUsername = intent.getStringExtra("receiver_username")
-            val receiverImg = intent.getStringExtra("receiver_img")
-            val receiverToken = intent.getStringExtra("receiver_token")
-
-            if (receiverId != null && receiverUsername != null && receiverImg != null && receiverToken != null)
-                currentUser = User(receiverId, receiverUsername, receiverImg, receiverToken)
-
-            if (senderId != null && senderUsername != null && senderImg != null && senderToken != null) {
-                val user = User(senderId, senderUsername, senderImg, senderToken)
-
+            if (intent.getStringExtra("group_id") != null) { // group msg
+                val groupId = intent.getStringExtra("group_id")
+                val groupName = intent.getStringExtra("group_name")
+                val groupImage = intent.getStringExtra("group_image")
+                val groupSize = intent.getStringExtra("group_size").toInt()
+                val usersList = arrayListOf<User>()
+                for (i in 0 until groupSize) {
+                    val user = User(
+                        intent.getStringExtra("receiver_id${i + 1}"),
+                        intent.getStringExtra("receiver_username${i + 1}"),
+                        intent.getStringExtra("receiver_img${i + 1}"),
+                        intent.getStringExtra("receiver_token${i + 1}")
+                    )
+                    usersList.add(user)
+                }
+                currentUser = usersList.find { it.uid == FirebaseAuth.getInstance().uid }
+                val group = Group(groupId, groupName, groupImage, usersList)
                 val intent = Intent(this, ChatLogActivity::class.java)
-                intent.putExtra(NewMessageActivity.USER_KEY, user)
-
-
+                intent.putExtra(NewMessageActivity.GROUP_KEY, group)
                 startActivity(intent)
+
+            } else { // user to user msg
+                val receiverId = intent.getStringExtra("receiver_id")
+                val receiverUsername = intent.getStringExtra("receiver_username")
+                val receiverImg = intent.getStringExtra("receiver_img")
+                val receiverToken = intent.getStringExtra("receiver_token")
+
+                if (receiverId != null && receiverUsername != null && receiverImg != null && receiverToken != null)
+                    currentUser = User(receiverId, receiverUsername, receiverImg, receiverToken)
+
+                if (senderId != null && senderUsername != null && senderImg != null && senderToken != null) {
+                    val user = User(senderId, senderUsername, senderImg, senderToken)
+
+                    val intent = Intent(this, ChatLogActivity::class.java)
+                    intent.putExtra(NewMessageActivity.USER_KEY, user)
+                    startActivity(intent)
+                }
             }
 
 
@@ -242,8 +269,12 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             R.id.menu_create_group -> {
-                if (currentUser == null){
-                    Toast.makeText(this, "Couldn't load your details, please try again", Toast.LENGTH_SHORT).show()
+                if (currentUser == null) {
+                    Toast.makeText(
+                        this,
+                        "Couldn't load your details, please try again",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return false
                 }
                 val intent = Intent(this, ChooseUserForGroupActivity::class.java)
