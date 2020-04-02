@@ -105,6 +105,7 @@ exports.newMessageGroup = functions.database.ref('/group-messages/{groupId}/{mes
                 sender_token: senderUser.token,
 
                 group_id: group.uid,
+                group_admin_uid: group.groupAdmin,
                 group_name: group.groupName,
                 group_image: group.groupImageUrl,
                 group_size: group.usersList.length.toString()

@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
@@ -106,7 +107,7 @@ class CreateGroupActivity : AppCompatActivity() {
 
     private fun saveGroupToFirebaseDataBase(groupId: String, groupImageUrl: String) {
         val ref = FirebaseDatabase.getInstance().getReference("/users/$groupId")
-        val group = Group(groupId, groupNameCreateGroup.text.toString(), groupImageUrl, chosenUsers)
+        val group = Group(groupId, FirebaseAuth.getInstance().uid!!, groupNameCreateGroup.text.toString(), groupImageUrl, chosenUsers)
         ref.setValue(group).addOnSuccessListener {
             Log.d(TAG, "Successfully saved group to Firebase!")
             Toast.makeText(this, "You new group has been created!", Toast.LENGTH_SHORT)

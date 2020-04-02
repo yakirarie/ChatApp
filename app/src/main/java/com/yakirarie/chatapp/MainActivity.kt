@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
                     usersList.add(user)
                 }
                 currentUser = usersList.find { it.uid == FirebaseAuth.getInstance().uid }
-                val group = Group(groupId, groupName, groupImage, usersList)
+                val group = Group(groupId, intent.getStringExtra("group_admin_uid"), groupName, groupImage, usersList)
                 val intent = Intent(this, ChatLogActivity::class.java)
                 intent.putExtra(NewMessageActivity.GROUP_KEY, group)
                 startActivity(intent)

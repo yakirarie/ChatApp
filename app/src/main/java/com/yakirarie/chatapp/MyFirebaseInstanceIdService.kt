@@ -55,6 +55,7 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             }
             group = Group(
                 params["group_id"]!!,
+                params["group_admin_uid"]!!,
                 params["group_name"]!!,
                 params["group_image"]!!,
                 usersList
@@ -121,9 +122,10 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
         resultIntent.putExtra(NewMessageActivity.USER_KEY, senderUser)
         if (currentUser != null)
             resultIntent.putExtra(MainActivity.CURRENT_USER, currentUser)
-
         else if (group != null) {
-            resultIntent.putExtra(MainActivity.CURRENT_USER, group!!.usersList.find { it.uid == FirebaseAuth.getInstance().uid })
+            resultIntent.putExtra(
+                MainActivity.CURRENT_USER,
+                group!!.usersList.find { it.uid == FirebaseAuth.getInstance().uid })
             resultIntent.putExtra(NewMessageActivity.GROUP_KEY, group)
         }
         val resultPendingIntent =

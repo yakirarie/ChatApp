@@ -1,21 +1,22 @@
 package com.yakirarie.chatapp
 
 import android.content.Intent
+import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.user_create_group.view.*
 
-class UserItemCreateGroup(val user: User?, private val chosenUsers: ArrayList<String>) : Item<GroupieViewHolder>() {
+class UserItemGroupInfo(val user: User, val group: Group) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.user_create_group
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        if (chosenUsers.size != 0 && chosenUsers.contains(user!!.uid))
-            viewHolder.itemView.background = viewHolder.itemView.resources.getDrawable(R.drawable.gradient_chosen, null)
-        viewHolder.itemView.textViewCreateGroupUsername.text = user!!.username
+        if (user.uid == group.groupAdminUID)
+                viewHolder.itemView.adminIcon.visibility = View.VISIBLE
+        viewHolder.itemView.textViewCreateGroupUsername.text = user.username
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)
             .placeholder(R.drawable.ic_loading_sign)
             .error(R.drawable.ic_error_sign).diskCacheStrategy(
