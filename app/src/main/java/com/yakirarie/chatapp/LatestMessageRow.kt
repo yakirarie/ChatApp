@@ -15,7 +15,8 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.latest_message_row.view.*
 
-class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null) : Item<GroupieViewHolder>() {
+class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null) :
+    Item<GroupieViewHolder>() {
     var chatPartnerUser: User? = null
     var group: Group? = null
 
@@ -54,8 +55,14 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
                             DiskCacheStrategy.ALL
                         ).into(viewHolder.itemView.imageViewLatestProfile)
 
+                    viewHolder.itemView.textViewLatestMessage.text =
+                        "${group!!.usersList.filter { it.uid == chatMessage.fromId }[0].username}: ${chatMessage.text}"
+                    Log.d("check", "${viewHolder.itemView.textViewLatestMessage.text}")
+
+
                     viewHolder.itemView.imageViewLatestProfile.setOnClickListener {
-                        val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
+                        val intent =
+                            Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
                         intent.putExtra("image_url", group?.groupImageUrl)
                         intent.putExtra("media_type", "image")
 
@@ -68,8 +75,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
             })
 
 
-        }
-        else { // user to user
+        } else { // user to user
             val chatPartnerId: String = if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
                 chatMessage.toId[0]
             } else
@@ -92,7 +98,8 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
                         ).into(viewHolder.itemView.imageViewLatestProfile)
 
                     viewHolder.itemView.imageViewLatestProfile.setOnClickListener {
-                        val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
+                        val intent =
+                            Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
                         intent.putExtra("image_url", chatPartnerUser?.profileImageUrl)
                         intent.putExtra("media_type", "image")
 
@@ -135,13 +142,14 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
             ).into(viewHolder.itemView.sendVideoLatestMessageThumbnail)
     }
 
-    private fun handleTextMessage(viewHolder: GroupieViewHolder){
+    private fun handleTextMessage(viewHolder: GroupieViewHolder) {
         viewHolder.itemView.frameLayoutLatestMessage.visibility = View.GONE
         viewHolder.itemView.videoPreviewPlayButtonLatestMessage.visibility = View.GONE
         viewHolder.itemView.sendImageLatestMessage.visibility = View.GONE
         viewHolder.itemView.sendVideoLatestMessageThumbnail.visibility = View.GONE
         viewHolder.itemView.textViewLatestMessage.visibility = View.VISIBLE
         viewHolder.itemView.textViewLatestMessage.text = chatMessage.text
+
     }
 
 }

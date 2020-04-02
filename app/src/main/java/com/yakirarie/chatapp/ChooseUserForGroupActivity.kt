@@ -67,8 +67,8 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         }
 
         floatingActionButtonNext.setOnClickListener {
-            if (chosenUsersIds.size < 1)
-                Toast.makeText(this, "Please choose at list one user", Toast.LENGTH_LONG).show()
+            if (chosenUsersIds.size < 2)
+                Toast.makeText(this, "Please choose at list two users", Toast.LENGTH_LONG).show()
             else {
                 val chosenUsersList = arrayListOf<User>()
                 usersList.forEach {
@@ -105,7 +105,7 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-
+                if (p0.child("groupName").exists()) return
                 val user = p0.getValue(User::class.java) ?: return
                 if (user.uid != FirebaseAuth.getInstance().uid) {
                     usersMap[p0.key!!] = user
@@ -115,6 +115,7 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+                if (p0.child("groupName").exists()) return
                 val user = p0.getValue(User::class.java) ?: return
                 if (user.uid != FirebaseAuth.getInstance().uid) {
                     usersMap[p0.key!!] = user
