@@ -44,15 +44,25 @@ class MainActivity : AppCompatActivity() {
         adapter.setOnItemClickListener { item, view ->
             val intent = Intent(this, ChatLogActivity::class.java)
             val row = item as LatestMessageRow
-            if (row.chatPartnerUser == null)
-                if (row.chatMessage.fromId == FirebaseAuth.getInstance().uid)
-                    removeDeletedUserInteractionsWithYou(row.chatMessage.toId[0])
-                else
-                    removeDeletedUserInteractionsWithYou(row.chatMessage.fromId)
-            else {
-                intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
-                startActivity(intent)
+            if (row.chatMessage.toId.size == 1) { // user to user msg
+                if (row.chatPartnerUser == null)
+                    if (row.chatMessage.fromId == FirebaseAuth.getInstance().uid)
+                        removeDeletedUserInteractionsWithYou(row.chatMessage.toId[0])
+                    else
+                        removeDeletedUserInteractionsWithYou(row.chatMessage.fromId)
+                else {
+                    intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
+                    startActivity(intent)
+                }
+            } else { // group msg
+                if (row.group == null)
+                    removeDeletedGroupInteractionsWithYou(row.groupId!!)
+                else {
+                    intent.putExtra(NewMessageActivity.GROUP_KEY, row.group)
+                    startActivity(intent)
+                }
             }
+
         }
         listenForLatestMessages()
         verifyUserLoggedIn()
@@ -76,7 +86,6 @@ class MainActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
         refLatest.removeValue().addOnSuccessListener {
             Log.d(TAG, "user $deletedId deleted from your latest messages")
-            Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
 
         }.addOnFailureListener {
 
@@ -95,6 +104,21 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    private fun removeDeletedGroupInteractionsWithYou(deletedId: String){
+        Toast.makeText(this, "This group no longer exists", Toast.LENGTH_SHORT).show()
+        val uid = FirebaseAuth.getInstance().uid
+        val refLatest =
+            FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
+        refLatest.removeValue().addOnSuccessListener {
+            Log.d(TAG, "group $deletedId deleted from your latest messages")
+
+        }.addOnFailureListener {
+
+            Log.e(TAG, "Failed to delete latest-messages with group : ${it.message}")
+
+        }
     }
 
     private fun checkIfTokenHasChanged() {
@@ -128,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         if (toUser != null) {  // my notification
             if (currentUser == null)
                 currentUser = intent.getParcelableExtra(CURRENT_USER)
-            
+
             val intent = Intent(this, ChatLogActivity::class.java)
 
             if (toGroup != null) // group
@@ -207,6 +231,7 @@ class MainActivity : AppCompatActivity() {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
                 latestMessagesMap[p0.key!!] = chatMessage
+
                 refreshRecyclerViewMessages()
 
             }
@@ -223,8 +248,18 @@ class MainActivity : AppCompatActivity() {
     private fun refreshRecyclerViewMessages() {
         adapter.clear()
         latestMessagesMap.values.forEach {
-            Log.d("test", it.toString())
-            adapter.add(LatestMessageRow(it))
+            if (it.toId.size > 1) {
+                adapter.add(
+                    LatestMessageRow(
+                        it,
+                        latestMessagesMap.filterValues { chatMessage -> it.id == chatMessage.id }.keys.elementAt(
+                            0
+                        )
+                    )
+                )
+            } else
+                adapter.add(LatestMessageRow(it))
+
         }
     }
 

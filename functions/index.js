@@ -137,14 +137,19 @@ exports.newMessageGroup = functions.database.ref('/group-messages/{groupId}/{mes
         // }
         const responses = []
         for (const user of group.usersList) {
-            try {
-                const response = admin.messaging().sendToDevice(user.token, payload);
-                responses.push(response)
-                return console.log("Successfully sent message:", response);
-            } catch (error) {
-                return console.log("Error sending message:", error);
+            if (senderId !== user.uid){
+                try {
+                    const response = admin.messaging().sendToDevice(user.token, payload);
+                    responses.push(response)
+                } catch (error) {
+                    console.log("Error sending message to "+user.username+":", error);
+                }
             }
+            
         }
-        await Promise.all(responses);
+        const responses_results = await Promise.all(responses);
+        for (const res of responses_results)
+            console.log("Successfully sent message", res);
+
 
     });

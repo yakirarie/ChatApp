@@ -93,17 +93,15 @@ class ChatLogActivity : AppCompatActivity() {
         }
 
         if (toId != null) {
-           handleTwoUsersChat(fromId, toId)
-        }
-
-        else if (toIds != null){
-          handleGroupChat(fromId, toIds as ArrayList<User>)
+            handleTwoUsersChat(fromId, toId)
+        } else if (toIds != null) {
+            handleGroupChat(fromId, toIds as ArrayList<User>)
         }
 
 
     }
 
-    private fun handleTwoUsersChat(fromId: String,toId: String){
+    private fun handleTwoUsersChat(fromId: String, toId: String) {
         val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId")
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -155,7 +153,7 @@ class ChatLogActivity : AppCompatActivity() {
         })
     }
 
-    private fun handleGroupChat(fromId: String, toIds: ArrayList<User>){
+    private fun handleGroupChat(fromId: String, toIds: ArrayList<User>) {
         val ref = FirebaseDatabase.getInstance().getReference("/group-messages/${toGroup!!.uid}")
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -187,7 +185,12 @@ class ChatLogActivity : AppCompatActivity() {
                             freezeGui(false)
 
                     } else {
-                        adapter.add(ChatToItem(chatMessage, toIds.find { it.uid == chatMessage.fromId }!!))
+                        adapter.add(
+                            ChatToItem(
+                                chatMessage,
+                                toIds.find { it.uid == chatMessage.fromId }!!
+                            )
+                        )
 
                         if (numberOfOldMessages != null) {
                             if (adapter.itemCount > numberOfOldMessages!!)
@@ -276,13 +279,11 @@ class ChatLogActivity : AppCompatActivity() {
         if (media == null) {
             text = editTextChatLog.text.trim().toString()
             if (text.isEmpty()) return
-        }
-
-        else
+        } else
             text = media
 
         val fromId = FirebaseAuth.getInstance().uid ?: return
-        if (toUser != null){
+        if (toUser != null) {
             val toId = toUser!!.uid
 
             val ref =
@@ -325,16 +326,17 @@ class ChatLogActivity : AppCompatActivity() {
             latestMessagesToRef.setValue(chatMessage).addOnSuccessListener {
                 Log.d(TAG, "Saved our chat latest-to-message: ${latestMessagesToRef.key}")
             }
-        }
-
-        else if (toGroup != null){
+        } else if (toGroup != null) {
             val toIds = ArrayList<String>()
             toGroup!!.usersList.forEach {
                 if (it.uid != FirebaseAuth.getInstance().uid)
                     toIds.add(it.uid)
             }
             val ref =
-                FirebaseDatabase.getInstance().getReference("/group-messages/${toGroup!!.uid}").push()
+                FirebaseDatabase.getInstance().getReference("/group-messages/${toGroup!!.uid}")
+                    .push()
+
+
             val chatMessage =
                 ChatMessage(
                     ref.key!!,
@@ -353,6 +355,24 @@ class ChatLogActivity : AppCompatActivity() {
                 if (chatMessage.messageType == "text")
                     editTextChatLog.text.clear()
                 recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
+            }
+
+            for (user in toGroup!!.usersList) {
+                if (user.uid != fromId) {
+                    val latestMessagesRef =
+                        FirebaseDatabase.getInstance()
+                            .getReference("/latest-messages/${user.uid}/${toGroup!!.uid}")
+                    latestMessagesRef.setValue(chatMessage).addOnSuccessListener {
+                        Log.d(TAG, "Saved our chat latest-from-message: ${latestMessagesRef.key}")
+                    }
+                } else {
+                    val latestMessagesRef =
+                        FirebaseDatabase.getInstance()
+                            .getReference("/latest-messages/$fromId/${toGroup!!.uid}")
+                    latestMessagesRef.setValue(chatMessage).addOnSuccessListener {
+                        Log.d(TAG, "Saved our chat latest-from-message: ${latestMessagesRef.key}")
+                    }
+                }
             }
         }
 
@@ -402,7 +422,7 @@ class ChatLogActivity : AppCompatActivity() {
             PERMISSION_CODE -> {
                 if (grantResults.isNotEmpty()) {
                     grantResults.forEach {
-                        if (it != PackageManager.PERMISSION_GRANTED){
+                        if (it != PackageManager.PERMISSION_GRANTED) {
                             Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
                             return
                         }
