@@ -31,7 +31,7 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choose_users_for_group)
-        supportActionBar?.title = "Select User"
+        supportActionBar?.title = "Create Group"
         val currentUser = intent.getParcelableExtra<User>(MainActivity.CURRENT_USER)
 
         if (savedInstanceState != null) {

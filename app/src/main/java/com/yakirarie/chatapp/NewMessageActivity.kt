@@ -14,6 +14,7 @@ import com.xwray.groupie.GroupieViewHolder
 import androidx.appcompat.widget.SearchView
 import kotlinx.android.synthetic.main.activity_new_message.*
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
@@ -78,8 +79,10 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
                 val data: Any
                 if (p0.child("groupName").exists()) {
-                    data = p0.getValue(Group::class.java) ?: return
-                    usersMap[p0.key!!] = data
+                    if (p0.getValue(Group::class.java)!!.usersList.none { it.uid == FirebaseAuth.getInstance().uid }) return
+                        data = p0.getValue(Group::class.java) ?: return
+                        usersMap[p0.key!!] = data
+
                 } else {
                     data = p0.getValue(User::class.java) ?: return
                     if (data.uid != FirebaseAuth.getInstance().uid)
@@ -93,6 +96,7 @@ class NewMessageActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val data: Any
                 if (p0.child("groupName").exists()) {
+                    if (p0.getValue(Group::class.java)!!.usersList.none { it.uid == FirebaseAuth.getInstance().uid }) return
                     data = p0.getValue(Group::class.java) ?: return
                     usersMap[p0.key!!] = data
                 } else {

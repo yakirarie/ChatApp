@@ -1,6 +1,7 @@
 package com.yakirarie.chatapp
 
 import android.content.Intent
+import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.xwray.groupie.GroupieViewHolder
@@ -20,6 +21,8 @@ class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
                     DiskCacheStrategy.ALL
                 ).into(viewHolder.itemView.imageViewNewMessage)
+            viewHolder.itemView.imageViewGroupIcon.visibility = View.GONE
+
 
             viewHolder.itemView.imageViewNewMessage.setOnClickListener {
                 val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
@@ -36,6 +39,7 @@ class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
                     DiskCacheStrategy.ALL
                 ).into(viewHolder.itemView.imageViewNewMessage)
+            viewHolder.itemView.imageViewGroupIcon.visibility = View.VISIBLE
 
             viewHolder.itemView.imageViewNewMessage.setOnClickListener {
                 val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)

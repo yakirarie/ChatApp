@@ -27,6 +27,8 @@ class CreateGroupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_group)
+        supportActionBar?.title = "Create Group"
+
         chosenUsers = intent.getParcelableArrayListExtra<User>("CHOSEN_USERS")
 
         recyclerViewCreateGroup.adapter = adapter
