@@ -56,7 +56,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
                         ).into(viewHolder.itemView.imageViewLatestProfile)
 
                     viewHolder.itemView.textViewLatestMessage.text =
-                        "${group!!.usersList.filter { it.uid == chatMessage.fromId }[0].username}: ${chatMessage.text}"
+                        "${group?.usersList?.filter { it.uid == chatMessage.fromId }?.get(0)?.username}: ${chatMessage.text}"
                     Log.d("check", "${viewHolder.itemView.textViewLatestMessage.text}")
 
 

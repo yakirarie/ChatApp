@@ -8,13 +8,13 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.user_create_group.view.*
 
-class UserItemGroupInfo(val user: User, val group: Group) : Item<GroupieViewHolder>() {
+class UserItemGroupInfo(val user: User, val groupAdminUID: String) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.user_create_group
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        if (user.uid == group.groupAdminUID)
+        if (user.uid == groupAdminUID)
                 viewHolder.itemView.adminIcon.visibility = View.VISIBLE
         viewHolder.itemView.textViewCreateGroupUsername.text = user.username
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)

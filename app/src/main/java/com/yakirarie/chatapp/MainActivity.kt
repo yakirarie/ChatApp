@@ -314,7 +314,7 @@ class MainActivity : AppCompatActivity() {
                     return false
                 }
                 val intent = Intent(this, ChooseUserForGroupActivity::class.java)
-                intent.putExtra(MainActivity.CURRENT_USER, currentUser)
+                intent.putExtra(CURRENT_USER, currentUser)
                 startActivity(intent)
             }
         }

@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -33,9 +34,18 @@ class CreateGroupActivity : AppCompatActivity() {
         chosenUsers = intent.getParcelableArrayListExtra<User>("CHOSEN_USERS")
 
         recyclerViewCreateGroup.adapter = adapter
+        recyclerViewCreateGroup.addItemDecoration(
+            DividerItemDecoration(
+                this,
+                DividerItemDecoration.VERTICAL
+            )
+        )
 
+        val admin = chosenUsers.find { it.uid == FirebaseAuth.getInstance().uid!! }
+        chosenUsers.remove(admin)
+        chosenUsers.add(0, admin!!)
         for (user in chosenUsers)
-            adapter.add(DataItem(user))
+            adapter.add(UserItemGroupInfo(user, FirebaseAuth.getInstance().uid!!))
 
 
     }

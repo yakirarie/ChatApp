@@ -44,7 +44,7 @@ class GroupInfoActivity : AppCompatActivity() {
         group.usersList.remove(admin)
         group.usersList.add(0, admin!!)
         group.usersList.forEach {
-            adapter.add(UserItemGroupInfo(it, group))
+            adapter.add(UserItemGroupInfo(it, group.groupAdminUID))
         }
     }
 
