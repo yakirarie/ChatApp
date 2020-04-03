@@ -24,6 +24,8 @@ exports.newMessageTwoUsers = functions.database.ref('/latest-messages/{id1}/{id2
         if (context.params.id1 !== senderId)
             return
 
+        if (chatMessage.toId.length > 1) return
+
         const snap = await admin.database().ref("/users/" + senderId).once('value');
         const senderUser = snap.val();
         const snap_1 = await admin.database().ref("/users/" + receiverId).once('value');
@@ -149,7 +151,7 @@ exports.newGroupCreation = functions.database.ref('/users/{groupId}')
     .onWrite(async (change, context) => {
 
         const newGroup = change.after.val();
-        if (newGroup.groupName === null) return
+        if (typeof newGroup.groupName === "undefined") return
         const adminUser = newGroup.usersList.filter(user => user.uid === newGroup.groupAdminUID)[0];
 
         const payload = {
