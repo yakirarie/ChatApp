@@ -449,6 +449,16 @@ class ChatLogActivity : AppCompatActivity() {
                 startActivity(intent)
             }
 
+            R.id.menu_group_edit -> {
+                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID){
+                    Toast.makeText(this, "Only an admin can edit a group", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                val intent = Intent(this, ChooseUserForGroupActivity::class.java)
+                intent.putExtra("GROUP_INFO", toGroup)
+                startActivity(intent)
+            }
+
         }
         return super.onOptionsItemSelected(item)
     }
