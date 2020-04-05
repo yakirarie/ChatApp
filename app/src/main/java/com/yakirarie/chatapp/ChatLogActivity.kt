@@ -20,6 +20,7 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_chat_log.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,10 +39,13 @@ class ChatLogActivity : AppCompatActivity() {
     val adapter = GroupAdapter<GroupieViewHolder>()
     var player: MediaPlayer? = null
     var numberOfOldMessages: Int? = null
+    var messagesMap = mutableListOf<Item<GroupieViewHolder>>()
+    lateinit var listener: ChildEventListener
 
     private val PERMISSION_CODE = 1000
     private val IMAGE_CAPTURE_CODE = 1001
     var imageUri: Uri? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +58,6 @@ class ChatLogActivity : AppCompatActivity() {
             supportActionBar?.title = toUser!!.username
         else if (toGroup != null)
             supportActionBar?.title = toGroup!!.groupName
-        listenForMessages()
     }
 
     private fun playMessageSound() {
@@ -79,13 +82,17 @@ class ChatLogActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         stopMessageSound()
+        if (toUser != null)
+            FirebaseDatabase.getInstance().getReference("/user-messages/${FirebaseAuth.getInstance().uid!!}/${toUser!!.uid}").removeEventListener(
+                listener
+            )
     }
 
     override fun onStart() {
         super.onStart()
-        initPlayer()
-    }
+        listenForMessages()
 
+    }
 
     private fun listenForMessages() {
         val fromId = FirebaseAuth.getInstance().uid ?: return
@@ -114,7 +121,7 @@ class ChatLogActivity : AppCompatActivity() {
             }
 
         })
-        ref.addChildEventListener(object : ChildEventListener {
+        listener = (object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
 
@@ -122,38 +129,62 @@ class ChatLogActivity : AppCompatActivity() {
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+
+                val chatMessage =
+                    p0.getValue(ChatMessage::class.java) ?: return
+
+                if (chatMessage.fromId == fromId) {
+                    val oldMessage = messagesMap.find {
+                        if (it is ChatFromItem)
+                            it.chatMessage.id == chatMessage.id
+                        else
+                            (it as ChatToItem).chatMessage.id == chatMessage.id
+                    }
+                    val ind = messagesMap.indexOf(oldMessage)
+                    messagesMap[ind] = ChatFromItem(chatMessage, MainActivity.currentUser!!)
+                    if (chatMessage.messageType != "text")
+                        freezeGui(false)
+
+                }
+                adapter.update(messagesMap)
+                recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
+
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+
                 val chatMessage =
-                    p0.getValue(ChatMessage::class.java)
+                    p0.getValue(ChatMessage::class.java) ?: return
 
-                if (chatMessage != null) {
-                    if (chatMessage.fromId == fromId) {
-                        adapter.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
-                        if (chatMessage.messageType != "text")
-                            freezeGui(false)
+                if (chatMessage.fromId == fromId) {
+                    messagesMap.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
+                    if (chatMessage.messageType != "text")
+                        freezeGui(false)
 
-                    } else {
-                        adapter.add(ChatToItem(chatMessage, toUser!!))
-
-                        if (numberOfOldMessages != null) {
-                            if (adapter.itemCount > numberOfOldMessages!!)
-                                playMessageSound()
-                        }
-
+                } else {
+                    FirebaseDatabase.getInstance()
+                        .getReference("/user-messages/${chatMessage.fromId}/${chatMessage.toId[0]}/${chatMessage.id}/seen")
+                        .setValue(
+                            true
+                        )
+                    messagesMap.add(ChatToItem(chatMessage, toUser!!))
+                    if (numberOfOldMessages != null) {
+                        if (messagesMap.size > numberOfOldMessages!!)
+                            playMessageSound()
                     }
+
                 }
-
+                adapter.update(messagesMap)
                 recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
-
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {
             }
 
         })
+        ref.addChildEventListener(listener)
     }
+
 
     private fun handleGroupChat(fromId: String, toIds: ArrayList<User>) {
         val ref = FirebaseDatabase.getInstance().getReference("/group-messages/${toGroup!!.uid}")
@@ -290,7 +321,8 @@ class ChatLogActivity : AppCompatActivity() {
             val ref =
                 FirebaseDatabase.getInstance().getReference("/user-messages/$fromId/$toId").push()
             val toRef =
-                FirebaseDatabase.getInstance().getReference("/user-messages/$toId/$fromId").push()
+                FirebaseDatabase.getInstance()
+                    .getReference("/user-messages/$toId/$fromId").push()
             val latestMessagesRef =
                 FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
             val latestMessagesToRef =
@@ -306,7 +338,7 @@ class ChatLogActivity : AppCompatActivity() {
                         "dd/MM/yyyy HH:mm",
                         Locale.getDefault()
                     ).format(Calendar.getInstance().time),
-                    messageType
+                    messageType, false, System.currentTimeMillis() / 1000
                 )
 
             ref.setValue(chatMessage).addOnSuccessListener {
@@ -316,6 +348,7 @@ class ChatLogActivity : AppCompatActivity() {
                 recyclerViewChatLog.scrollToPosition(adapter.itemCount - 1)
             }
 
+            chatMessage.seen = true
             toRef.setValue(chatMessage).addOnSuccessListener {
                 Log.d(TAG, "Saved our chat to-message: ${toRef.key}")
             }
@@ -348,7 +381,7 @@ class ChatLogActivity : AppCompatActivity() {
                         "dd/MM/yyyy HH:mm",
                         Locale.getDefault()
                     ).format(Calendar.getInstance().time),
-                    messageType
+                    messageType, false, System.currentTimeMillis() / 1000
                 )
 
             ref.setValue(chatMessage).addOnSuccessListener {
@@ -449,8 +482,9 @@ class ChatLogActivity : AppCompatActivity() {
             }
 
             R.id.menu_group_edit -> {
-                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID){
-                    Toast.makeText(this, "Only an admin can edit a group", Toast.LENGTH_SHORT).show()
+                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID) {
+                    Toast.makeText(this, "Only an admin can edit a group", Toast.LENGTH_SHORT)
+                        .show()
                     return false
                 }
                 val intent = Intent(this, ChooseUserForGroupActivity::class.java)
@@ -460,8 +494,9 @@ class ChatLogActivity : AppCompatActivity() {
             }
 
             R.id.menu_group_delete -> {
-                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID){
-                    Toast.makeText(this, "Only an admin can delete a group", Toast.LENGTH_SHORT).show()
+                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID) {
+                    Toast.makeText(this, "Only an admin can delete a group", Toast.LENGTH_SHORT)
+                        .show()
                     return false
                 }
                 val bundle = Bundle()

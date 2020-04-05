@@ -6,8 +6,9 @@ class ChatMessage(
     val text: String,
     val fromId: String,
     val toId: MutableList<String>,
-    val timestamp: String,
-    val messageType: String
+    val dateAndTime: String,
+    val messageType: String,
+    var seen: Boolean, val timestamp: Long
 ) {
-    constructor() : this("", "", "", mutableListOf<String>(""), "", "")
+    constructor() : this("", "", "", mutableListOf<String>(""), "", "", false, -1)
 }

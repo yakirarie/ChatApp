@@ -7,13 +7,40 @@
     android:layout_marginBottom="12dp">
 
     <ImageView
+        android:id="@+id/messageNotSeen"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_msg_not_seen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/textViewFromRow"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/messageSeen"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+
+        android:src="@drawable/ic_msg_seen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textViewFromRow"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
         android:id="@+id/sendImageFromRow"
         android:layout_width="170dp"
         android:layout_height="170dp"
-        android:scaleType="centerCrop"
         android:layout_marginStart="40dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/image_background"
+        android:scaleType="centerCrop"
 
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@+id/timestampFromRow"
@@ -28,9 +55,9 @@
         android:background="@drawable/rounded_textview"
         android:maxWidth="240dp"
         android:padding="16dp"
-        tools:text="This is my message"
         app:layout_constraintStart_toEndOf="@+id/imageViewFromRow"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="This is my message" />
 
     <TextView
         android:id="@+id/timestampFromRow"
@@ -54,7 +81,8 @@
         android:layout_marginTop="8dp"
         app:civ_border_width="2dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/profiledefault" />
 
     <FrameLayout
         android:id="@+id/frameLayoutFromRow"
@@ -64,28 +92,26 @@
         android:layout_marginTop="8dp"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@+id/timestampFromRow"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/sendVideoFromRowThumbnail"
             android:layout_width="170dp"
             android:layout_height="170dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/image_background"
             android:alpha="0.6"
-            android:visibility="gone"
-         />
+            android:background="@drawable/image_background"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/videoPreviewPlayButtonFromRow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:visibility="gone"
-            android:background="@drawable/thumbnail_background"
             android:layout_gravity="center_horizontal|center"
-            android:src="@drawable/ic_video_icon" />
+            android:background="@drawable/thumbnail_background"
+            android:padding="8dp"
+            android:src="@drawable/ic_video_icon"
+            android:visibility="gone" />
 
     </FrameLayout>
 

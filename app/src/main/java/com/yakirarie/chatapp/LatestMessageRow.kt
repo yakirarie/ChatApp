@@ -19,6 +19,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
     Item<GroupieViewHolder>() {
     var chatPartnerUser: User? = null
     var group: Group? = null
+    var enableClick = false
 
     override fun getLayout(): Int {
         return R.layout.latest_message_row
@@ -47,7 +48,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
 
                 override fun onDataChange(p0: DataSnapshot) {
                     group = p0.getValue(Group::class.java)
-
+                    enableClick = true
                     viewHolder.itemView.textViewLatestUsername.text = group?.groupName
                     Glide.with(viewHolder.itemView.context).load(group?.groupImageUrl)
                         .placeholder(R.drawable.ic_loading_sign)
@@ -89,6 +90,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
 
                 override fun onDataChange(p0: DataSnapshot) {
                     chatPartnerUser = p0.getValue(User::class.java)
+                    enableClick = true
 
                     viewHolder.itemView.textViewLatestUsername.text = chatPartnerUser?.username
                     Glide.with(viewHolder.itemView.context).load(chatPartnerUser?.profileImageUrl)

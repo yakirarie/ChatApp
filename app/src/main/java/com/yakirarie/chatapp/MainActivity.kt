@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         adapter.setOnItemClickListener { item, view ->
             val intent = Intent(this, ChatLogActivity::class.java)
             val row = item as LatestMessageRow
+            if (!row.enableClick) return@setOnItemClickListener
             if (row.chatMessage.toId.size == 1) { // user to user msg
                 if (row.chatPartnerUser == null)
                     if (row.chatMessage.fromId == FirebaseAuth.getInstance().uid)

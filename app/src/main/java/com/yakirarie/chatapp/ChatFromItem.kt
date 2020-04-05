@@ -1,6 +1,7 @@
 package com.yakirarie.chatapp
 
 import android.content.Intent
+import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -9,7 +10,7 @@ import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.chat_from_row.view.*
 
 
-class ChatFromItem(private val chatMessage: ChatMessage, val user: User) :
+class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
     Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.chat_from_row
@@ -29,8 +30,17 @@ class ChatFromItem(private val chatMessage: ChatMessage, val user: User) :
             }
         }
 
+        if (chatMessage.seen) {
+            viewHolder.itemView.messageSeen.visibility = View.VISIBLE
+            viewHolder.itemView.messageNotSeen.visibility = View.GONE
+
+        } else {
+            viewHolder.itemView.messageSeen.visibility = View.GONE
+            viewHolder.itemView.messageNotSeen.visibility = View.VISIBLE
+
+        }
         viewHolder.itemView.textViewFromRow.text = chatMessage.text
-        val timeAndDate = chatMessage.timestamp.split(" ")
+        val timeAndDate = chatMessage.dateAndTime.split(" ")
         viewHolder.itemView.timestampFromRow.text = "${timeAndDate[1]}\n${timeAndDate[0]}"
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)
             .placeholder(R.drawable.ic_loading_sign)
@@ -94,7 +104,7 @@ class ChatFromItem(private val chatMessage: ChatMessage, val user: User) :
         }
     }
 
-    private fun handleTextMessage(viewHolder: GroupieViewHolder){
+    private fun handleTextMessage(viewHolder: GroupieViewHolder) {
         viewHolder.itemView.frameLayoutFromRow.visibility = View.GONE
         viewHolder.itemView.videoPreviewPlayButtonFromRow.visibility = View.GONE
         viewHolder.itemView.sendVideoFromRowThumbnail.visibility = View.GONE

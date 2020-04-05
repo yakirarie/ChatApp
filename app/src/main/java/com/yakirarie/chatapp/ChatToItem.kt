@@ -8,7 +8,7 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.chat_to_row.view.*
 
-class ChatToItem(private val chatMessage: ChatMessage, val user: User) : Item<GroupieViewHolder>() {
+class ChatToItem(val chatMessage: ChatMessage, val user: User) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.chat_to_row
     }
@@ -26,7 +26,7 @@ class ChatToItem(private val chatMessage: ChatMessage, val user: User) : Item<Gr
             }
         }
 
-        val timeAndDate = chatMessage.timestamp.split(" ")
+        val timeAndDate = chatMessage.dateAndTime.split(" ")
         viewHolder.itemView.timestampToRow.text = "${timeAndDate[1]}\n${timeAndDate[0]}"
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)
             .placeholder(R.drawable.ic_loading_sign)
