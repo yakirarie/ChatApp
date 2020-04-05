@@ -456,6 +456,7 @@ class ChatLogActivity : AppCompatActivity() {
                 }
                 val intent = Intent(this, ChooseUserForGroupActivity::class.java)
                 intent.putExtra("GROUP_INFO", toGroup)
+                intent.putExtra(MainActivity.CURRENT_USER, MainActivity.currentUser!!)
                 startActivity(intent)
             }
 

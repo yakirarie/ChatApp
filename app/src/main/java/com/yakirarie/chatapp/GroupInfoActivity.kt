@@ -19,7 +19,7 @@ class GroupInfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_info)
         supportActionBar?.title = "Group Info"
-        group = intent.getParcelableExtra<Group>("GROUP_INFO")
+        group = intent.getParcelableExtra("GROUP_INFO")
         recyclerViewGroupInfo.adapter = adapter
         recyclerViewGroupInfo.addItemDecoration(
             DividerItemDecoration(

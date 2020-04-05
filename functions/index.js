@@ -148,7 +148,7 @@ exports.newMessageGroup = functions.database.ref('/group-messages/{groupId}/{mes
 
 // listen for new group creation
 exports.newGroupCreation = functions.database.ref('/users/{groupId}')
-    .onWrite(async (change, context) => {
+    .onCreate(async (change, context) => {
 
         const newGroup = change.after.val();
         if (typeof newGroup.groupName === "undefined") return
@@ -158,7 +158,7 @@ exports.newGroupCreation = functions.database.ref('/users/{groupId}')
 
             notification: {
                 title: adminUser.username + " Created " + newGroup.groupName,
-                body: "You, " + adminUser.username + " and " + newGroup.usersList.length.toString() + " more"
+                body: "You, " + adminUser.username + " and " + (newGroup.usersList.length - 2).toString() + " more"
             },
             data: {
                 sender_id: adminUser.uid,

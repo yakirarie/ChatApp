@@ -9,6 +9,8 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
@@ -72,7 +74,11 @@ class CreateUserActivity : AppCompatActivity() {
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-            changeProfileMyProfile.setImageBitmap(bitmap)
+            Glide.with(this).load(bitmap)
+                .placeholder(R.drawable.ic_loading_sign)
+                .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                    DiskCacheStrategy.ALL
+                ).into(changeProfileCreateUser)
             defaultProfileImageView.alpha = 0f
 
         }

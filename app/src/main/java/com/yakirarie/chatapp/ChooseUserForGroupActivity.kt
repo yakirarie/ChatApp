@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -31,8 +32,15 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choose_users_for_group)
-        supportActionBar?.title = "Create Group"
         val currentUser = intent.getParcelableExtra<User>(MainActivity.CURRENT_USER)
+        val currentGroup = intent.getParcelableExtra<Group>("GROUP_INFO")
+
+        supportActionBar?.title = if (currentGroup == null) "Create Group" else "Edit Group"
+
+        currentGroup?.usersList?.forEach {
+            if (it.uid != FirebaseAuth.getInstance().uid)
+                chosenUsersIds.add(it.uid)
+        }
 
         if (savedInstanceState != null) {
             if (savedInstanceState.getParcelableArrayList<User>("CHOSEN_USERS") != null) {
@@ -67,6 +75,7 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         }
 
         floatingActionButtonNext.setOnClickListener {
+
             if (chosenUsersIds.size < 2)
                 Toast.makeText(this, "Please choose at list two users", Toast.LENGTH_LONG).show()
             else {
@@ -78,6 +87,8 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
                 chosenUsersList.add(currentUser)
                 val intent = Intent(this, CreateGroupActivity::class.java)
                 intent.putParcelableArrayListExtra("CHOSEN_USERS", chosenUsersList)
+                if (currentGroup != null)
+                    intent.putExtra("GROUP_INFO", currentGroup)
                 startActivity(intent)
 
             }

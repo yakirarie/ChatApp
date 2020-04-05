@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -25,13 +27,25 @@ class CreateGroupActivity : AppCompatActivity() {
     private val adapter = GroupAdapter<GroupieViewHolder>()
     private val TAG = "CreateGroupDebug"
     private var selectedPhotoUri: Uri? = null
+    private var currentGroup: Group? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_group)
-        supportActionBar?.title = "Create Group"
 
         chosenUsers = intent.getParcelableArrayListExtra<User>("CHOSEN_USERS")
+        currentGroup = intent.getParcelableExtra("GROUP_INFO")
+        supportActionBar?.title = if (currentGroup == null) "Create Group" else "Edit Group"
+
+
+        if (currentGroup != null){
+            Glide.with(this).load(currentGroup!!.groupImageUrl)
+                .placeholder(R.drawable.ic_loading_sign)
+                .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                    DiskCacheStrategy.ALL
+                ).into(changeProfileCreateGroup)
+            groupNameCreateGroup.setText(currentGroup!!.groupName)
+        }
 
         recyclerViewCreateGroup.adapter = adapter
         recyclerViewCreateGroup.addItemDecoration(
@@ -62,7 +76,11 @@ class CreateGroupActivity : AppCompatActivity() {
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-            changeProfileCreateGroup.setImageBitmap(bitmap)
+            Glide.with(this).load(bitmap)
+                .placeholder(R.drawable.ic_loading_sign)
+                .error(R.drawable.ic_error_sign).diskCacheStrategy(
+                    DiskCacheStrategy.ALL
+                ).into(changeProfileCreateGroup)
             defaultProfileCreateGroup.alpha = 0f
 
         }
@@ -73,13 +91,23 @@ class CreateGroupActivity : AppCompatActivity() {
             Toast.makeText(this, "Please provide a group name", Toast.LENGTH_SHORT).show()
             return
         }
-        if (selectedPhotoUri == null) {
-            Toast.makeText(this, "Please provide a group image", Toast.LENGTH_SHORT).show()
-            return
+        if (currentGroup == null) {
+            if (selectedPhotoUri == null) {
+                Toast.makeText(this, "Please provide a group image", Toast.LENGTH_SHORT).show()
+                return
+            }
+            freezeGui(true)
+            val groupId = UUID.randomUUID().toString()
+            uploadImageToFirebaseStorage(groupId)
         }
-        freezeGui(true)
-        val groupId = UUID.randomUUID().toString()
-        uploadImageToFirebaseStorage(groupId)
+        else{
+            freezeGui(true)
+            if (selectedPhotoUri != null)
+                uploadImageToFirebaseStorage(currentGroup!!.uid)
+            else
+                saveGroupToFirebaseDataBase(currentGroup!!.uid, currentGroup!!.groupImageUrl)
+        }
+
 
     }
 
@@ -120,7 +148,9 @@ class CreateGroupActivity : AppCompatActivity() {
         val group = Group(groupId, FirebaseAuth.getInstance().uid!!, groupNameCreateGroup.text.toString(), groupImageUrl, chosenUsers)
         ref.setValue(group).addOnSuccessListener {
             Log.d(TAG, "Successfully saved group to Firebase!")
-            Toast.makeText(this, "You new group has been created!", Toast.LENGTH_SHORT)
+            val msg = if (currentGroup == null) "created" else "edited"
+
+            Toast.makeText(this, "Your group has been $msg successfully!", Toast.LENGTH_SHORT)
                 .show()
             freezeGui(false)
 
@@ -129,10 +159,12 @@ class CreateGroupActivity : AppCompatActivity() {
             startActivity(intent)
 
         }.addOnFailureListener {
-            Log.d(TAG, "Failed to save user to Firebase: ${it.message}")
+            Log.d(TAG, "Failed to save group to Firebase: ${it.message}")
+            val msg = if (currentGroup == null) "create" else "edit"
+
             Toast.makeText(
                 this,
-                "Failed to create your group: ${it.message}",
+                "Failed to $msg your group: ${it.message}",
                 Toast.LENGTH_SHORT
             )
                 .show()
