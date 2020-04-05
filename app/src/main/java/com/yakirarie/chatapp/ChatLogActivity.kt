@@ -246,7 +246,6 @@ class ChatLogActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebaseStorage(selectedPhotoUri: Uri) {
-        Toast.makeText(this, selectedPhotoUri.toString(), Toast.LENGTH_LONG).show()
         val messageType = when {
             selectedPhotoUri.toString().contains("image") -> {
                 "image"
@@ -259,7 +258,7 @@ class ChatLogActivity : AppCompatActivity() {
         val filename = UUID.randomUUID().toString()
         val uid = FirebaseAuth.getInstance().uid
 
-        val ref = FirebaseStorage.getInstance().getReference("/imagesMessages/$uid/$filename")
+        val ref = FirebaseStorage.getInstance().getReference("/Media Messages/$uid/$filename")
 
         ref.putFile(selectedPhotoUri).addOnSuccessListener {
             Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
@@ -458,6 +457,18 @@ class ChatLogActivity : AppCompatActivity() {
                 intent.putExtra("GROUP_INFO", toGroup)
                 intent.putExtra(MainActivity.CURRENT_USER, MainActivity.currentUser!!)
                 startActivity(intent)
+            }
+
+            R.id.menu_group_delete -> {
+                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID){
+                    Toast.makeText(this, "Only an admin can delete a group", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                val bundle = Bundle()
+                bundle.putParcelable("GROUP_TO_DELETE", toGroup)
+                val customDialog = DeleteGroupDialog()
+                customDialog.arguments = bundle
+                customDialog.show(supportFragmentManager, "delete group")
             }
 
         }

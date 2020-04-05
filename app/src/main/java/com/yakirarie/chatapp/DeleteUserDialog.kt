@@ -98,7 +98,7 @@ class DeleteUserDialog : DialogFragment() {
             deleteUserMessages(userToDelete)
         }.addOnFailureListener {
 
-            Log.e(TAG, "Failed to delete user-messages : ${it.message}")
+            Log.e(TAG, "Failed to delete username : ${it.message}")
             deleteUserMessages(userToDelete)
 
         }
@@ -111,7 +111,7 @@ class DeleteUserDialog : DialogFragment() {
             deleteUserLatestMessages(userToDelete)
         }.addOnFailureListener {
 
-            Log.e(TAG, "Failed to delete username : ${it.message}")
+            Log.e(TAG, "Failed to delete user-messages : ${it.message}")
             deleteUserLatestMessages(userToDelete)
 
 
@@ -138,15 +138,15 @@ class DeleteUserDialog : DialogFragment() {
             FirebaseStorage.getInstance().getReference("/images/$imageLocation")
         oldRef.delete().addOnSuccessListener {
             Log.d(TAG, "Successfully deleted old image")
-            deleteUserMessagesImages(userToDelete)
+            deleteUserMediaMessages(userToDelete)
         }.addOnFailureListener {
-            deleteUserMessagesImages(userToDelete)
+            deleteUserMediaMessages(userToDelete)
             Log.e(TAG, "Failed to delete old image: ${it.message} $imageLocation")
         }
 
     }
 
-    private fun deleteUserMessagesImages(userToDelete: User?) {
+    private fun deleteUserMediaMessages(userToDelete: User?) {
         val oldRef =
             FirebaseStorage.getInstance().getReference("/imagesMessages/${userToDelete!!.uid}")
         oldRef.listAll().addOnSuccessListener {
@@ -180,7 +180,7 @@ class DeleteUserDialog : DialogFragment() {
             freezeGui(false)
             dialog?.dismiss()
             activity?.finish()
-            Log.d(TAG, "Failed to delete authentication")
+            Log.e(TAG, "Failed to delete authentication")
         }
 
 

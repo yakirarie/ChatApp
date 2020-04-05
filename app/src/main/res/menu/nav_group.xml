@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_group_delete"
+        android:icon="@drawable/ic_delete_icon"
+        android:title="Group Delete"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menu_group_edit"
         android:icon="@drawable/ic_edit_icon"
         android:title="Group Edit"

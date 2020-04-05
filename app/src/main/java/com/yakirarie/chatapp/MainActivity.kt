@@ -76,6 +76,8 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         verifyUserLoggedIn()
         fetchCurrentUser()
+        listenForLatestMessages()
+
 
     }
 
