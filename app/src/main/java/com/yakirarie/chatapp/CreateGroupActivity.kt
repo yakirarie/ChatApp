@@ -112,7 +112,7 @@ class CreateGroupActivity : AppCompatActivity() {
     }
 
     private fun uploadImageToFirebaseStorage(groupId: String) {
-        val ref = FirebaseStorage.getInstance().getReference("/groupsImages/$groupId")
+        val ref = FirebaseStorage.getInstance().getReference("/Groups Profiles/$groupId")
 
         ref.putFile(selectedPhotoUri!!).addOnSuccessListener {
             Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")

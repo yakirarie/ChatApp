@@ -86,7 +86,7 @@ class DeleteGroupDialog: DialogFragment() {
     private fun deleteGroupImage(groupToDelete: Group) {
         val imageLocation = extractFilenameFromUrl(groupToDelete)
         val oldRef =
-            FirebaseStorage.getInstance().getReference("/groupsImages/$imageLocation")
+            FirebaseStorage.getInstance().getReference("/Groups Profiles/$imageLocation")
         oldRef.delete().addOnSuccessListener {
             Log.d(TAG, "Successfully deleted old image")
             deleteGroupMediaMessages(groupToDelete)

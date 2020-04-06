@@ -135,7 +135,7 @@ class DeleteUserDialog : DialogFragment() {
     private fun deleteUserImage(userToDelete: User?) {
         val imageLocation = extractFilenameFromUrl(userToDelete)
         val oldRef =
-            FirebaseStorage.getInstance().getReference("/images/$imageLocation")
+            FirebaseStorage.getInstance().getReference("/Profile Images/$imageLocation")
         oldRef.delete().addOnSuccessListener {
             Log.d(TAG, "Successfully deleted old image")
             deleteUserMediaMessages(userToDelete)

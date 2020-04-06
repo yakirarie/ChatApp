@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -26,12 +27,20 @@ class MyProfileActivity : AppCompatActivity() {
     private val TAG = "MyProfileActivityDebug"
     private var currentUser: User? = null
     private var selectedPhotoUri: Uri? = null
+    private val statuses = arrayListOf(
+        "\uD83D\uDC4C Available \uD83D\uDC4C",
+        "\uD83D\uDD0C Low Battery \uD83D\uDD0C",
+        "\uD83D\uDEA8 Emergencies Only \uD83D\uDEA8",
+        "\uD83D\uDD15 Busy \uD83D\uDD15"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_profile)
         supportActionBar?.title = "My Profile"
         fetchCurrentUser()
+        val arrayAdapter = ArrayAdapter(this, R.layout.spinner_item, statuses)
+        spinnerStatus.adapter = arrayAdapter
     }
 
     private fun fetchCurrentUser() {
@@ -49,6 +58,7 @@ class MyProfileActivity : AppCompatActivity() {
                     .error(R.drawable.ic_error_sign).diskCacheStrategy(
                         DiskCacheStrategy.ALL
                     ).into(changeProfileMyProfile)
+                spinnerStatus.setSelection(statuses.indexOf(currentUser!!.status))
 
             }
 
@@ -65,14 +75,13 @@ class MyProfileActivity : AppCompatActivity() {
         customDialog.show(supportFragmentManager, "custom dialog")
     }
 
-    fun viewImageFullScreen(view: View){
+    fun viewImageFullScreen(view: View) {
         if (currentUser == null) return
         val intent = Intent(this, FullScreenMedia::class.java)
         if (selectedPhotoUri != null) {
             intent.putExtra("image_uri", selectedPhotoUri)
             intent.putExtra("media_type", "image")
-        }
-        else {
+        } else {
             intent.putExtra("image_url", currentUser!!.profileImageUrl)
             intent.putExtra("media_type", "image")
         }
@@ -124,7 +133,8 @@ class MyProfileActivity : AppCompatActivity() {
             currentUser!!.uid,
             usernameMyProfile.text.toString(),
             profileImageUrl,
-            currentUser!!.token
+            currentUser!!.token,
+            spinnerStatus.selectedItem.toString()
         )
         val ref = FirebaseDatabase.getInstance().getReference("users/${currentUser!!.uid}")
         ref.setValue(updatedUser).addOnSuccessListener {
@@ -169,7 +179,7 @@ class MyProfileActivity : AppCompatActivity() {
     private fun deleteOldProfileImage() {
         val imageLocation = extractFilenameFromUrl()
         val oldRef =
-            FirebaseStorage.getInstance().getReference("/images/$imageLocation")
+            FirebaseStorage.getInstance().getReference("/Profile Images/$imageLocation")
         oldRef.delete().addOnSuccessListener {
             Log.d(TAG, "Successfully deleted old image")
             uploadImageToFirebaseStorage()
@@ -189,7 +199,7 @@ class MyProfileActivity : AppCompatActivity() {
 
     private fun uploadImageToFirebaseStorage() {
         val filename = UUID.randomUUID().toString()
-        val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
+        val ref = FirebaseStorage.getInstance().getReference("/Profile Images/$filename")
         ref.putFile(selectedPhotoUri!!).addOnSuccessListener {
             Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
             ref.downloadUrl.addOnSuccessListener {

@@ -101,7 +101,7 @@ class CreateUserActivity : AppCompatActivity() {
 
     private fun uploadImageToFirebaseStorage() {
         val filename = UUID.randomUUID().toString()
-        val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
+        val ref = FirebaseStorage.getInstance().getReference("/Profile Images/$filename")
 
         ref.putFile(selectedPhotoUri!!).addOnSuccessListener {
             Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")

@@ -16,6 +16,7 @@ class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         if (data is User) {
             viewHolder.itemView.textViewNewMessageUsername.text = data.username
+            viewHolder.itemView.statusNewMessage.text = data.status
             Glide.with(viewHolder.itemView.context).load(data.profileImageUrl)
                 .placeholder(R.drawable.ic_loading_sign)
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
