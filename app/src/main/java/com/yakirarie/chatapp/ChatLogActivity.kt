@@ -90,6 +90,8 @@ class ChatLogActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        messagesMap.clear()
+        adapter.clear()
         listenForMessages()
 
     }
@@ -133,7 +135,7 @@ class ChatLogActivity : AppCompatActivity() {
                 val chatMessage =
                     p0.getValue(ChatMessage::class.java) ?: return
 
-                if (chatMessage.fromId == fromId) {
+                if (chatMessage.fromId == fromId) { // if other user saw my message
                     val oldMessage = messagesMap.find {
                         if (it is ChatFromItem)
                             it.chatMessage.id == chatMessage.id
@@ -162,11 +164,7 @@ class ChatLogActivity : AppCompatActivity() {
                         freezeGui(false)
 
                 } else {
-                    FirebaseDatabase.getInstance()
-                        .getReference("/user-messages/${chatMessage.fromId}/${chatMessage.toId[0]}/${chatMessage.id}/seen")
-                        .setValue(
-                            true
-                        )
+                    updateMessageIsSeen(chatMessage)
                     messagesMap.add(ChatToItem(chatMessage, toUser!!))
                     if (numberOfOldMessages != null) {
                         if (messagesMap.size > numberOfOldMessages!!)
@@ -183,6 +181,19 @@ class ChatLogActivity : AppCompatActivity() {
 
         })
         ref.addChildEventListener(listener)
+    }
+
+    private fun updateMessageIsSeen(chatMessage: ChatMessage){
+        FirebaseDatabase.getInstance()
+            .getReference("/user-messages/${chatMessage.fromId}/${chatMessage.toId[0]}/${chatMessage.id}/seen")
+            .setValue(
+                true
+            )
+        FirebaseDatabase.getInstance()
+            .getReference("/latest-messages/${chatMessage.fromId}/${chatMessage.toId[0]}/seen")
+            .setValue(
+                true
+            )
     }
 
 
@@ -353,10 +364,12 @@ class ChatLogActivity : AppCompatActivity() {
                 Log.d(TAG, "Saved our chat to-message: ${toRef.key}")
             }
 
+            chatMessage.seen = false
             latestMessagesRef.setValue(chatMessage).addOnSuccessListener {
                 Log.d(TAG, "Saved our chat latest-from-message: ${latestMessagesRef.key}")
             }
 
+            chatMessage.seen = true
             latestMessagesToRef.setValue(chatMessage).addOnSuccessListener {
                 Log.d(TAG, "Saved our chat latest-to-message: ${latestMessagesToRef.key}")
             }

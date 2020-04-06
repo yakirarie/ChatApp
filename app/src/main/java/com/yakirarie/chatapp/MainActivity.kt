@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     val adapter = GroupAdapter<GroupieViewHolder>()
     val latestMessagesMap = HashMap<String, ChatMessage>()
+    lateinit var listener: ChildEventListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +66,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-        listenForLatestMessages()
         verifyUserLoggedIn()
         fetchCurrentUser()
         receivedNotification()
@@ -80,6 +80,13 @@ class MainActivity : AppCompatActivity() {
         listenForLatestMessages()
 
 
+    }
+
+    override fun onStop() {
+        super.onStop()
+        FirebaseDatabase.getInstance()
+            .getReference("/latest-messages/${FirebaseAuth.getInstance().uid}")
+            .removeEventListener(listener)
     }
 
     private fun removeDeletedUserInteractionsWithYou(deletedId: String) {
@@ -109,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun removeDeletedGroupInteractionsWithYou(deletedId: String){
+    private fun removeDeletedGroupInteractionsWithYou(deletedId: String) {
         Toast.makeText(this, "This group no longer exists", Toast.LENGTH_SHORT).show()
         val uid = FirebaseAuth.getInstance().uid
         val refLatest =
@@ -188,7 +195,13 @@ class MainActivity : AppCompatActivity() {
                     usersList.add(user)
                 }
                 currentUser = usersList.find { it.uid == FirebaseAuth.getInstance().uid }
-                val group = Group(groupId, intent.getStringExtra("group_admin_uid"), groupName, groupImage, usersList)
+                val group = Group(
+                    groupId,
+                    intent.getStringExtra("group_admin_uid"),
+                    groupName,
+                    groupImage,
+                    usersList
+                )
                 val intent = Intent(this, ChatLogActivity::class.java)
                 intent.putExtra(NewMessageActivity.GROUP_KEY, group)
                 startActivity(intent)
@@ -218,7 +231,7 @@ class MainActivity : AppCompatActivity() {
     private fun listenForLatestMessages() {
         val fromId = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId")
-        ref.addChildEventListener(object : ChildEventListener {
+        listener = (object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
 
@@ -246,6 +259,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+        ref.addChildEventListener(listener)
     }
 
     private fun refreshRecyclerViewMessages() {

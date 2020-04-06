@@ -39,6 +39,8 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
             }
         }
 
+        checkIfMessageHasBeenSeen(viewHolder)
+
         if (chatMessage.toId.size > 1) { // group msg
             val ref = FirebaseDatabase.getInstance().getReference("/users/$groupId")
             ref.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -151,6 +153,22 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
         viewHolder.itemView.sendVideoLatestMessageThumbnail.visibility = View.GONE
         viewHolder.itemView.textViewLatestMessage.visibility = View.VISIBLE
         viewHolder.itemView.textViewLatestMessage.text = chatMessage.text
+
+    }
+
+    private fun checkIfMessageHasBeenSeen(viewHolder: GroupieViewHolder) {
+        if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
+            if (chatMessage.seen) {
+                viewHolder.itemView.latestMessageSeen.visibility = View.VISIBLE
+                viewHolder.itemView.latestMessageNotSeen.visibility = View.GONE
+
+            } else {
+                viewHolder.itemView.latestMessageSeen.visibility = View.GONE
+                viewHolder.itemView.latestMessageNotSeen.visibility = View.VISIBLE
+
+            }
+        }
+
 
     }
 

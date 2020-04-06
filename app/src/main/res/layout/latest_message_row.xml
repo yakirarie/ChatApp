@@ -7,6 +7,31 @@
     android:background="?android:attr/selectableItemBackground"
     >
 
+    <ImageView
+        android:id="@+id/latestMessageNotSeen"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_msg_not_seen"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textViewLatestMessage"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/latestMessageSeen"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_msg_seen"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textViewLatestMessage"
+        app:layout_constraintTop_toTopOf="parent" />
     <FrameLayout
         android:id="@+id/frameLayoutLatestMessage"
         android:layout_width="90dp"
@@ -67,7 +92,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/addchannelbutton" />
+        tools:src="@drawable/profiledefault" />
 
     <TextView
         android:id="@+id/textViewLatestUsername"

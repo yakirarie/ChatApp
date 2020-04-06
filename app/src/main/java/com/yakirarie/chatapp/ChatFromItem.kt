@@ -29,16 +29,9 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
                 handleTextMessage(viewHolder)
             }
         }
+        if (chatMessage.toId.size == 1)
+            checkIfMessageHasBeenSeen(viewHolder)
 
-        if (chatMessage.seen) {
-            viewHolder.itemView.messageSeen.visibility = View.VISIBLE
-            viewHolder.itemView.messageNotSeen.visibility = View.GONE
-
-        } else {
-            viewHolder.itemView.messageSeen.visibility = View.GONE
-            viewHolder.itemView.messageNotSeen.visibility = View.VISIBLE
-
-        }
         viewHolder.itemView.textViewFromRow.text = chatMessage.text
         val timeAndDate = chatMessage.dateAndTime.split(" ")
         viewHolder.itemView.timestampFromRow.text = "${timeAndDate[1]}\n${timeAndDate[0]}"
@@ -111,6 +104,18 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
         viewHolder.itemView.sendImageFromRow.visibility = View.GONE
         viewHolder.itemView.textViewFromRow.visibility = View.VISIBLE
         viewHolder.itemView.textViewFromRow.text = chatMessage.text
+    }
+
+    private fun checkIfMessageHasBeenSeen(viewHolder: GroupieViewHolder){
+        if (chatMessage.seen) {
+            viewHolder.itemView.messageSeen.visibility = View.VISIBLE
+            viewHolder.itemView.messageNotSeen.visibility = View.GONE
+
+        } else {
+            viewHolder.itemView.messageSeen.visibility = View.GONE
+            viewHolder.itemView.messageNotSeen.visibility = View.VISIBLE
+
+        }
     }
 
 }

@@ -12,10 +12,10 @@
         android:layout_height="25dp"
         android:layout_marginStart="8dp"
         android:src="@drawable/ic_msg_not_seen"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        android:visibility="gone"
         app:layout_constraintStart_toEndOf="@+id/textViewFromRow"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,9 +24,8 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_marginStart="8dp"
-        android:visibility="gone"
-
         android:src="@drawable/ic_msg_seen"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

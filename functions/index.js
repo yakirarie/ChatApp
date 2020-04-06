@@ -21,10 +21,9 @@ exports.newMessageTwoUsers = functions.database.ref('/latest-messages/{id1}/{id2
         const senderId = chatMessage.fromId;
         const messageText = chatMessage.text;
 
-        if (context.params.id1 !== senderId)
-            return
-
-        if (chatMessage.toId.length > 1) return
+        if (change.before.exists() && chatMessage.timestamp === change.before.val().timestamp) return //prevent notifying for seen msgs
+        if (context.params.id1 !== senderId) return //prevent notifing the sender
+        if (chatMessage.toId.length > 1) return //msg is a group msg no need to notify 2 users chat
 
         const snap = await admin.database().ref("/users/" + senderId).once('value');
         const senderUser = snap.val();
