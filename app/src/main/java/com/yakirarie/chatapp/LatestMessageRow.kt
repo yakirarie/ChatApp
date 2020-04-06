@@ -39,7 +39,6 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
             }
         }
 
-        checkIfMessageHasBeenSeen(viewHolder)
 
         if (chatMessage.toId.size > 1) { // group msg
             val ref = FirebaseDatabase.getInstance().getReference("/users/$groupId")
@@ -79,6 +78,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
 
 
         } else { // user to user
+            checkIfMessageHasBeenSeen(viewHolder)
             val chatPartnerId: String = if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
                 chatMessage.toId[0]
             } else
@@ -167,6 +167,9 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
                 viewHolder.itemView.latestMessageNotSeen.visibility = View.VISIBLE
 
             }
+        } else {
+            viewHolder.itemView.latestMessageSeen.visibility = View.GONE
+            viewHolder.itemView.latestMessageNotSeen.visibility = View.GONE
         }
 
 
