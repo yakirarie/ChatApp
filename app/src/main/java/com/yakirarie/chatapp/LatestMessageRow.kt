@@ -14,6 +14,8 @@ import com.google.firebase.database.ValueEventListener
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.latest_message_row.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null) :
     Item<GroupieViewHolder>() {
@@ -39,7 +41,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
             }
         }
 
-
+        showTimestamp(viewHolder)
         if (chatMessage.toId.size > 1) { // group msg
             val ref = FirebaseDatabase.getInstance().getReference("/users/$groupId")
             ref.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -158,20 +160,40 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
 
     private fun checkIfMessageHasBeenSeen(viewHolder: GroupieViewHolder) {
         if (chatMessage.fromId == FirebaseAuth.getInstance().uid) {
-            if (chatMessage.seen) {
-                viewHolder.itemView.latestMessageSeen.visibility = View.VISIBLE
-                viewHolder.itemView.latestMessageNotSeen.visibility = View.GONE
+            viewHolder.itemView.latestMessageIsMessageSeen.visibility = View.VISIBLE
 
-            } else {
-                viewHolder.itemView.latestMessageSeen.visibility = View.GONE
-                viewHolder.itemView.latestMessageNotSeen.visibility = View.VISIBLE
+            if (chatMessage.seen)
+                viewHolder.itemView.latestMessageIsMessageSeen.setImageDrawable(
+                    viewHolder.itemView.resources.getDrawable(
+                        R.drawable.ic_msg_seen,
+                        null
+                    )
+                )
+            else
+                viewHolder.itemView.latestMessageIsMessageSeen.setImageDrawable(
+                    viewHolder.itemView.resources.getDrawable(
+                        R.drawable.ic_msg_not_seen,
+                        null
+                    )
+                )
 
-            }
-        } else {
-            viewHolder.itemView.latestMessageSeen.visibility = View.GONE
-            viewHolder.itemView.latestMessageNotSeen.visibility = View.GONE
-        }
 
+        } else
+            viewHolder.itemView.latestMessageIsMessageSeen.visibility = View.GONE
+
+
+    }
+
+    private fun showTimestamp(viewHolder: GroupieViewHolder) {
+        val currentDay = SimpleDateFormat(
+            "dd/MM/yyyy",
+            Locale.getDefault()
+        ).format(Calendar.getInstance().time)
+        val dateAndTime = chatMessage.dateAndTime.split(" ")
+        if (currentDay == dateAndTime[0])
+            viewHolder.itemView.timestampLatestMessage.text = dateAndTime[1]
+        else
+            viewHolder.itemView.timestampLatestMessage.text = dateAndTime[0]
 
     }
 

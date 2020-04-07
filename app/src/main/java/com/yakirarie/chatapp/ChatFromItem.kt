@@ -33,8 +33,8 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
             checkIfMessageHasBeenSeen(viewHolder)
 
         viewHolder.itemView.textViewFromRow.text = chatMessage.text
-        val timeAndDate = chatMessage.dateAndTime.split(" ")
-        viewHolder.itemView.timestampFromRow.text = "${timeAndDate[1]}\n${timeAndDate[0]}"
+        val dateAndTime = chatMessage.dateAndTime.split(" ")
+        viewHolder.itemView.timestampFromRow.text = "${dateAndTime[1]}\n${dateAndTime[0]}"
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)
             .placeholder(R.drawable.ic_loading_sign)
             .error(R.drawable.ic_error_sign).diskCacheStrategy(

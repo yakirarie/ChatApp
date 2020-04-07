@@ -4,34 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
-    >
+    android:background="?android:attr/selectableItemBackground">
+
 
     <ImageView
-        android:id="@+id/latestMessageNotSeen"
+        android:id="@+id/latestMessageIsMessageSeen"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_marginStart="8dp"
-        android:src="@drawable/ic_msg_not_seen"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewLatestMessage"
         app:layout_constraintStart_toEndOf="@+id/textViewLatestMessage"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/textViewLatestMessage"
+        tools:src="@drawable/ic_msg_not_seen" />
 
-    <ImageView
-        android:id="@+id/latestMessageSeen"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/ic_msg_seen"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textViewLatestMessage"
-        app:layout_constraintTop_toTopOf="parent" />
     <FrameLayout
         android:id="@+id/frameLayoutLatestMessage"
         android:layout_width="90dp"
@@ -39,31 +24,30 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="15dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/sendVideoLatestMessageThumbnail"
             android:layout_width="90dp"
             android:layout_height="90dp"
-            android:background="@drawable/image_background"
             android:alpha="0.6"
+            android:background="@drawable/image_background"
             android:scaleType="centerCrop"
 
-            android:visibility="gone"
-             />
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/videoPreviewPlayButtonLatestMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:visibility="gone"
-            android:background="@drawable/thumbnail_background"
             android:layout_gravity="center_horizontal|center"
-            android:src="@drawable/ic_video_icon" />
+            android:background="@drawable/thumbnail_background"
+            android:padding="8dp"
+            android:src="@drawable/ic_video_icon"
+            android:visibility="gone" />
 
     </FrameLayout>
 
@@ -74,8 +58,8 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="15dp"
-        android:scaleType="centerCrop"
         android:background="@drawable/image_background"
+        android:scaleType="centerCrop"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -114,13 +98,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginBottom="40dp"
-        tools:text="Latest Message"
         android:maxWidth="180dp"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageViewLatestProfile" />
+        app:layout_constraintStart_toEndOf="@+id/imageViewLatestProfile"
+        tools:text="Latest Message" />
+
+    <TextView
+        android:id="@+id/timestampLatestMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:maxWidth="180dp"
+        android:textSize="12sp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewLatestProfile"
+        app:layout_constraintStart_toStartOf="@+id/imageViewLatestProfile"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewLatestProfile"
+        tools:text="20/20/2020" />
 </androidx.constraintlayout.widget.ConstraintLayout>

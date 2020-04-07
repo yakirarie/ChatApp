@@ -349,7 +349,7 @@ class ChatLogActivity : AppCompatActivity() {
                         "dd/MM/yyyy HH:mm",
                         Locale.getDefault()
                     ).format(Calendar.getInstance().time),
-                    messageType, false, System.currentTimeMillis() / 1000
+                    messageType, false
                 )
 
             ref.setValue(chatMessage).addOnSuccessListener {
@@ -394,7 +394,7 @@ class ChatLogActivity : AppCompatActivity() {
                         "dd/MM/yyyy HH:mm",
                         Locale.getDefault()
                     ).format(Calendar.getInstance().time),
-                    messageType, false, System.currentTimeMillis() / 1000
+                    messageType, false
                 )
 
             ref.setValue(chatMessage).addOnSuccessListener {

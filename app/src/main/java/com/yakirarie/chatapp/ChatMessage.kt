@@ -8,7 +8,7 @@ class ChatMessage(
     val toId: MutableList<String>,
     val dateAndTime: String,
     val messageType: String,
-    var seen: Boolean, val timestamp: Long
+    var seen: Boolean
 ) {
-    constructor() : this("", "", "", mutableListOf<String>(""), "", "", false, -1)
+    constructor() : this("", "", "", mutableListOf<String>(""), "", "", false)
 }
