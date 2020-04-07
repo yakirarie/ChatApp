@@ -1,8 +1,10 @@
 package com.yakirarie.chatapp
 
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.xwray.groupie.GroupieViewHolder
@@ -32,7 +34,6 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
         if (chatMessage.toId.size == 1)
             checkIfMessageHasBeenSeen(viewHolder)
 
-        viewHolder.itemView.textViewFromRow.text = chatMessage.text
         val dateAndTime = chatMessage.dateAndTime.split(" ")
         viewHolder.itemView.timestampFromRow.text = "${dateAndTime[1]}\n${dateAndTime[0]}"
         Glide.with(viewHolder.itemView.context).load(user.profileImageUrl)
@@ -104,6 +105,7 @@ class ChatFromItem(val chatMessage: ChatMessage, val user: User) :
         viewHolder.itemView.sendImageFromRow.visibility = View.GONE
         viewHolder.itemView.textViewFromRow.visibility = View.VISIBLE
         viewHolder.itemView.textViewFromRow.text = chatMessage.text
+
     }
 
     private fun checkIfMessageHasBeenSeen(viewHolder: GroupieViewHolder){
