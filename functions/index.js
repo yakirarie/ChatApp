@@ -20,8 +20,8 @@ exports.newMessageTwoUsers = functions.database.ref('/latest-messages/{id1}/{id2
         const receiverId = chatMessage.toId[0];
         const senderId = chatMessage.fromId;
         const messageText = chatMessage.text;
-
-        if (change.before.exists() && chatMessage.timestamp === change.before.val().timestamp) return //prevent notifying for seen msgs
+        
+        if (change.before.exists() && chatMessage.id === change.before.val().id) return //prevent notifying for seen msgs
         if (context.params.id1 !== senderId) return //prevent notifing the sender
         if (chatMessage.toId.length > 1) return //msg is a group msg no need to notify 2 users chat
 
