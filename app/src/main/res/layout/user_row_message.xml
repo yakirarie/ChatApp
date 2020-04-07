@@ -53,15 +53,5 @@
         app:layout_constraintTop_toTopOf="parent"
          />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imageViewGroupIcon"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:visibility="gone"
-        app:civ_border_width="4dp"
-        android:src="@drawable/ic_group_icon_black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textViewNewMessageUsername"
-        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

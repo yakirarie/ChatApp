@@ -493,39 +493,13 @@ class ChatLogActivity : AppCompatActivity() {
                 intent.putExtra("GROUP_INFO", toGroup)
                 startActivity(intent)
             }
-
-            R.id.menu_group_edit -> {
-                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID) {
-                    Toast.makeText(this, "Only an admin can edit a group", Toast.LENGTH_SHORT)
-                        .show()
-                    return false
-                }
-                val intent = Intent(this, ChooseUserForGroupActivity::class.java)
-                intent.putExtra("GROUP_INFO", toGroup)
-                intent.putExtra(MainActivity.CURRENT_USER, MainActivity.currentUser!!)
-                startActivity(intent)
-            }
-
-            R.id.menu_group_delete -> {
-                if (FirebaseAuth.getInstance().uid!! != toGroup!!.groupAdminUID) {
-                    Toast.makeText(this, "Only an admin can delete a group", Toast.LENGTH_SHORT)
-                        .show()
-                    return false
-                }
-                val bundle = Bundle()
-                bundle.putParcelable("GROUP_TO_DELETE", toGroup)
-                val customDialog = DeleteGroupDialog()
-                customDialog.arguments = bundle
-                customDialog.show(supportFragmentManager, "delete group")
-            }
-
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (toGroup != null)
-            menuInflater.inflate(R.menu.nav_group, menu)
+            menuInflater.inflate(R.menu.nav_group_chat, menu)
 
         return super.onCreateOptionsMenu(menu)
     }

@@ -1,5 +1,6 @@
 package com.yakirarie.chatapp
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -113,7 +114,9 @@ class DeleteGroupDialog: DialogFragment() {
                 .show()
             freezeGui(false)
             dialog?.dismiss()
-            activity?.finish()
+            val intent = Intent(view!!.context, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
         }.addOnFailureListener {
             Log.e(TAG, "Failed to deleted messages images directory ${it.message}")
             freezeGui(false)

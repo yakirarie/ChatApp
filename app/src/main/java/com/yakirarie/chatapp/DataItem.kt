@@ -22,8 +22,6 @@ class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
                     DiskCacheStrategy.ALL
                 ).into(viewHolder.itemView.imageViewNewMessage)
-            viewHolder.itemView.imageViewGroupIcon.visibility = View.GONE
-
 
             viewHolder.itemView.imageViewNewMessage.setOnClickListener {
                 val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
@@ -35,12 +33,12 @@ class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
             }
         } else if (data is Group){
             viewHolder.itemView.textViewNewMessageUsername.text = data.groupName
+            viewHolder.itemView.statusNewMessage.text = "Group: ${data.usersList.size} Participants"
             Glide.with(viewHolder.itemView.context).load(data.groupImageUrl)
                 .placeholder(R.drawable.ic_loading_sign)
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
                     DiskCacheStrategy.ALL
                 ).into(viewHolder.itemView.imageViewNewMessage)
-            viewHolder.itemView.imageViewGroupIcon.visibility = View.VISIBLE
 
             viewHolder.itemView.imageViewNewMessage.setOnClickListener {
                 val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)

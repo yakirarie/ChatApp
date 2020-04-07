@@ -147,9 +147,9 @@ exports.newMessageGroup = functions.database.ref('/group-messages/{groupId}/{mes
 
 // listen for new group creation
 exports.newGroupCreation = functions.database.ref('/users/{groupId}')
-    .onCreate(async (change, context) => {
+    .onCreate(async (snap, context) => {
 
-        const newGroup = change.after.val();
+        const newGroup = snap.val();
         if (typeof newGroup.groupName === "undefined") return
         const adminUser = newGroup.usersList.filter(user => user.uid === newGroup.groupAdminUID)[0];
 
