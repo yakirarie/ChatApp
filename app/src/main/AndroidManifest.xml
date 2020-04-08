@@ -11,25 +11,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.GroupInfoActivity"></activity>
+        <activity android:name=".activities.GroupInfoActivity"/>
         <activity
             android:name=".activities.CreateGroupActivity"
-            android:windowSoftInputMode="adjustNothing"></activity>
-        <activity android:name=".activities.ChooseUserForGroupActivity"></activity>
+            android:windowSoftInputMode="adjustNothing"/>
+        <activity android:name=".activities.ChooseUserForGroupActivity"/>
         <activity
             android:name=".activities.FullScreenMediaActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
-        <activity android:name=".MyProfileActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-        </activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
         <activity android:name=".activities.ChatLogActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-        </activity>
-        <activity android:name=".NewMessageActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
