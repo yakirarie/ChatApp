@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.activities
 
 import android.app.Activity
 import android.content.Intent
@@ -15,6 +15,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.classObjects.User
+import com.yakirarie.chatapp.dialogs.LoadingDialog
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
@@ -22,6 +25,7 @@ class CreateUserActivity : AppCompatActivity() {
 
     private val TAG = "CreateUserActivityDebug"
     private var selectedPhotoUri: Uri? = null
+    private val loadingDialog = LoadingDialog()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +49,7 @@ class CreateUserActivity : AppCompatActivity() {
                 .show()
             return
         }
-        freezeGui(true)
+        loadingDialog.show(supportFragmentManager, "loading")
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if (!it.isSuccessful) return@addOnCompleteListener
@@ -57,7 +61,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Log.d(TAG, "Failed to create user: ${it.message}")
                 Toast.makeText(this, "Failed to create user: ${it.message}", Toast.LENGTH_SHORT)
                     .show()
-                freezeGui(false)
+                loadingDialog.dismiss()
 
             }
 
@@ -73,8 +77,7 @@ class CreateUserActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-            Glide.with(this).load(bitmap)
+            Glide.with(this).load(selectedPhotoUri)
                 .placeholder(R.drawable.ic_loading_sign)
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
                     DiskCacheStrategy.ALL
@@ -82,21 +85,6 @@ class CreateUserActivity : AppCompatActivity() {
             defaultProfileImageView.alpha = 0f
 
         }
-    }
-
-    private fun freezeGui(toFreeze: Boolean){
-        if (toFreeze){
-            progressBarCreateUser.visibility = View.VISIBLE
-            selectPhotoBtn.isClickable = false
-            createUserBtn.isClickable = false
-        }
-        else{
-            progressBarCreateUser.visibility = View.GONE
-            selectPhotoBtn.isClickable = true
-            createUserBtn.isClickable = true
-        }
-
-
     }
 
     private fun uploadImageToFirebaseStorage() {
@@ -114,7 +102,7 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d(TAG, "Failed to upload Image: ${it.message}")
             Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
                 .show()
-            freezeGui(false)
+            loadingDialog.dismiss()
 
         }
 
@@ -133,7 +121,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            freezeGui(false)
+            loadingDialog.dismiss()
 
         }
 
@@ -143,12 +131,17 @@ class CreateUserActivity : AppCompatActivity() {
     private fun saveUserToFirebaseDataBase(profileImageUrl: String, token:String){
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        val user = User(uid, usernameMyProfile.text.toString(), profileImageUrl, token)
+        val user = User(
+            uid,
+            usernameMyProfile.text.toString(),
+            profileImageUrl,
+            token
+        )
         ref.setValue(user).addOnSuccessListener {
             Log.d(TAG, "Successfully saved user to Firestore!")
             Toast.makeText(this, "Welcome!", Toast.LENGTH_SHORT)
                 .show()
-            freezeGui(false)
+            loadingDialog.dismiss()
 
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -162,7 +155,7 @@ class CreateUserActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            freezeGui(false)
+            loadingDialog.dismiss()
 
 
         }

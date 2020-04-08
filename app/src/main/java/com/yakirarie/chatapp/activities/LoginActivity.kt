@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,9 +6,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.dialogs.LoadingDialog
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
+
+    private val loadingDialog = LoadingDialog()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,35 +27,22 @@ class LoginActivity : AppCompatActivity() {
             Toast.makeText(this, "Please fill all of the above", Toast.LENGTH_SHORT).show()
             return
         }
-        freezeGui(true)
+        loadingDialog.show(supportFragmentManager, "loading")
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener{
+            .addOnSuccessListener {
                 Toast.makeText(this, "Welcome Back!", Toast.LENGTH_SHORT)
                     .show()
                 val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
-                freezeGui(false)
+                loadingDialog.dismiss()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to login: ${it.message}", Toast.LENGTH_SHORT)
                     .show()
-                freezeGui(false)
+                loadingDialog.dismiss()
             }
 
-    }
-
-    private fun freezeGui(toFreeze: Boolean){
-        if (toFreeze){
-            progressBarLogin.visibility = View.VISIBLE
-            loginLoginBtn.isClickable = false
-            loginCreateUserBtn.isClickable = false
-        }
-        else{
-            progressBarLogin.visibility = View.GONE
-            loginLoginBtn.isClickable = true
-            loginCreateUserBtn.isClickable = true
-        }
     }
 
 

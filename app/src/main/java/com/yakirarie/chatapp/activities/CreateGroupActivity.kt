@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.activities
 
 import android.app.Activity
 import android.content.Intent
@@ -17,6 +17,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.classObjects.User
+import com.yakirarie.chatapp.adaptersItems.UserItemGroupInfo
+import com.yakirarie.chatapp.dialogs.LoadingDialog
 import kotlinx.android.synthetic.main.activity_create_group.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -28,6 +33,7 @@ class CreateGroupActivity : AppCompatActivity() {
     private val TAG = "CreateGroupDebug"
     private var selectedPhotoUri: Uri? = null
     private var currentGroup: Group? = null
+    private val loadingDialog = LoadingDialog()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +51,7 @@ class CreateGroupActivity : AppCompatActivity() {
                     DiskCacheStrategy.ALL
                 ).into(changeProfileCreateGroup)
             groupNameCreateGroup.setText(currentGroup!!.groupName)
+            confirmGroupCreateGroup.text = "Edit Group"
         }
 
         recyclerViewCreateGroup.adapter = adapter
@@ -59,7 +66,12 @@ class CreateGroupActivity : AppCompatActivity() {
         chosenUsers.remove(admin)
         chosenUsers.add(0, admin!!)
         for (user in chosenUsers)
-            adapter.add(UserItemGroupInfo(user, FirebaseAuth.getInstance().uid!!))
+            adapter.add(
+                UserItemGroupInfo(
+                    user,
+                    FirebaseAuth.getInstance().uid!!
+                )
+            )
 
 
     }
@@ -75,8 +87,7 @@ class CreateGroupActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-            Glide.with(this).load(bitmap)
+            Glide.with(this).load(selectedPhotoUri)
                 .placeholder(R.drawable.ic_loading_sign)
                 .error(R.drawable.ic_error_sign).diskCacheStrategy(
                     DiskCacheStrategy.ALL
@@ -96,17 +107,16 @@ class CreateGroupActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please provide a group image", Toast.LENGTH_SHORT).show()
                 return
             }
-            freezeGui(true)
             val groupId = UUID.randomUUID().toString()
             uploadImageToFirebaseStorage(groupId)
         }
         else{
-            freezeGui(true)
             if (selectedPhotoUri != null)
                 uploadImageToFirebaseStorage(currentGroup!!.uid)
             else
                 saveGroupToFirebaseDataBase(currentGroup!!.uid, currentGroup!!.groupImageUrl)
         }
+        loadingDialog.show(supportFragmentManager, "loading")
 
 
     }
@@ -125,34 +135,28 @@ class CreateGroupActivity : AppCompatActivity() {
             Log.d(TAG, "Failed to upload Image: ${it.message}")
             Toast.makeText(this, "Failed to upload Image: ${it.message}", Toast.LENGTH_SHORT)
                 .show()
-            freezeGui(false)
-
+            loadingDialog.dismiss()
         }
 
     }
 
-    private fun freezeGui(toFreeze: Boolean) {
-        if (toFreeze) {
-            progressBarCreateGroup.visibility = View.VISIBLE
-            selectPhotoCreateGroup.isClickable = false
-            confirmGroupCreateGroup.isClickable = false
-        } else {
-            progressBarCreateGroup.visibility = View.GONE
-            selectPhotoCreateGroup.isClickable = true
-            confirmGroupCreateGroup.isClickable = true
-        }
-    }
 
     private fun saveGroupToFirebaseDataBase(groupId: String, groupImageUrl: String) {
         val ref = FirebaseDatabase.getInstance().getReference("/users/$groupId")
-        val group = Group(groupId, FirebaseAuth.getInstance().uid!!, groupNameCreateGroup.text.toString(), groupImageUrl, chosenUsers)
+        val group = Group(
+            groupId,
+            FirebaseAuth.getInstance().uid!!,
+            groupNameCreateGroup.text.toString(),
+            groupImageUrl,
+            chosenUsers
+        )
         ref.setValue(group).addOnSuccessListener {
             Log.d(TAG, "Successfully saved group to Firebase!")
             val msg = if (currentGroup == null) "created" else "edited"
 
             Toast.makeText(this, "Your group has been $msg successfully!", Toast.LENGTH_SHORT)
                 .show()
-            freezeGui(false)
+            loadingDialog.dismiss()
 
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -168,7 +172,7 @@ class CreateGroupActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-            freezeGui(false)
+            loadingDialog.dismiss()
 
 
         }

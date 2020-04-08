@@ -10,12 +10,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.yakirarie.chatapp.*
+import com.yakirarie.chatapp.activities.FullScreenMediaActivity
+import com.yakirarie.chatapp.activities.MainActivity
+import com.yakirarie.chatapp.classObjects.User
+import com.yakirarie.chatapp.dialogs.DeleteUserDialog
+import com.yakirarie.chatapp.dialogs.LoadingDialog
 import kotlinx.android.synthetic.main.fragment_my_profile.*
 import java.util.*
 
@@ -85,7 +91,7 @@ class MyProfileFragment : Fragment() {
 
     private fun viewImageFullScreen() {
         if (currentUser == null) return
-        val intent = Intent(context, FullScreenMedia::class.java)
+        val intent = Intent(context, FullScreenMediaActivity::class.java)
         if (selectedPhotoUri != null) {
             intent.putExtra("image_uri", selectedPhotoUri)
             intent.putExtra("media_type", "image")
@@ -139,6 +145,7 @@ class MyProfileFragment : Fragment() {
             )
                 .show()
             MainActivity.currentUser = updatedUser
+            (activity as AppCompatActivity).supportActionBar?.title = updatedUser.username
             loadingDialog.dismiss()
 
         }.addOnFailureListener {

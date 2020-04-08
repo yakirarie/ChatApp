@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.dialogs
 
 import android.content.Intent
 import android.graphics.Color
@@ -12,6 +12,9 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.activities.MainActivity
+import com.yakirarie.chatapp.classObjects.Group
 import kotlinx.android.synthetic.main.delete_group_dialog.*
 
 class DeleteGroupDialog: DialogFragment() {

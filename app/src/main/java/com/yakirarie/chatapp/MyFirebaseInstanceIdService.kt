@@ -15,6 +15,10 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.yakirarie.chatapp.activities.ChatLogActivity
+import com.yakirarie.chatapp.activities.MainActivity
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.classObjects.User
 import com.yakirarie.chatapp.fragments.NewMessageFragment
 import java.io.InputStream
 import java.net.HttpURLConnection

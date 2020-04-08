@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.dialogs
 
 import android.content.Intent
 import android.graphics.Color
@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.auth.FirebaseAuth
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.activities.LoginActivity
 import kotlinx.android.synthetic.main.sign_out_dialog.*
 
 class SignOutDialog : DialogFragment() {

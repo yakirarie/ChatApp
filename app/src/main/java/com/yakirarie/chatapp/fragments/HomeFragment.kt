@@ -13,8 +13,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.yakirarie.chatapp.ChatLogActivity
-import com.yakirarie.chatapp.LatestMessageRow
+import com.yakirarie.chatapp.activities.ChatLogActivity
+import com.yakirarie.chatapp.adaptersItems.LatestMessageRow
 import com.yakirarie.chatapp.R
 import kotlinx.android.synthetic.main.fragment_home.*
 

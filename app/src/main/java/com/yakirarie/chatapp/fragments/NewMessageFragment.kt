@@ -10,6 +10,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.yakirarie.chatapp.*
+import com.yakirarie.chatapp.activities.ChatLogActivity
+import com.yakirarie.chatapp.adaptersItems.DataItem
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.classObjects.User
 import kotlinx.android.synthetic.main.fragment_new_message.*
 
 class NewMessageFragment: Fragment() {

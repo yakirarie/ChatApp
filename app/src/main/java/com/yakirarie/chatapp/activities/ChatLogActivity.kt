@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.activities
 
 import android.app.Activity
 import android.content.ContentValues
@@ -21,6 +21,12 @@ import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.adaptersItems.ChatFromItem
+import com.yakirarie.chatapp.adaptersItems.ChatToItem
+import com.yakirarie.chatapp.classObjects.ChatMessage
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.classObjects.User
 import com.yakirarie.chatapp.fragments.NewMessageFragment
 import kotlinx.android.synthetic.main.activity_chat_log.*
 import java.text.SimpleDateFormat
@@ -69,7 +75,9 @@ class ChatLogActivity : AppCompatActivity() {
 
     private fun initPlayer() {
         if (player == null)
-            player = MediaPlayer.create(applicationContext, R.raw.notification_sound)
+            player = MediaPlayer.create(applicationContext,
+                R.raw.notification_sound
+            )
     }
 
     private fun stopMessageSound() {
@@ -144,7 +152,11 @@ class ChatLogActivity : AppCompatActivity() {
                             (it as ChatToItem).chatMessage.id == chatMessage.id
                     }
                     val ind = messagesMap.indexOf(oldMessage)
-                    messagesMap[ind] = ChatFromItem(chatMessage, MainActivity.currentUser!!)
+                    messagesMap[ind] =
+                        ChatFromItem(
+                            chatMessage,
+                            MainActivity.currentUser!!
+                        )
                     if (chatMessage.messageType != "text")
                         freezeGui(false)
 
@@ -160,13 +172,23 @@ class ChatLogActivity : AppCompatActivity() {
                     p0.getValue(ChatMessage::class.java) ?: return
 
                 if (chatMessage.fromId == fromId) {
-                    messagesMap.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
+                    messagesMap.add(
+                        ChatFromItem(
+                            chatMessage,
+                            MainActivity.currentUser!!
+                        )
+                    )
                     if (chatMessage.messageType != "text")
                         freezeGui(false)
 
                 } else {
                     updateMessageIsSeen(chatMessage)
-                    messagesMap.add(ChatToItem(chatMessage, toUser!!))
+                    messagesMap.add(
+                        ChatToItem(
+                            chatMessage,
+                            toUser!!
+                        )
+                    )
                     if (numberOfOldMessages != null) {
                         if (messagesMap.size > numberOfOldMessages!!)
                             playMessageSound()
@@ -225,7 +247,12 @@ class ChatLogActivity : AppCompatActivity() {
 
                 if (chatMessage != null) {
                     if (chatMessage.fromId == fromId) {
-                        adapter.add(ChatFromItem(chatMessage, MainActivity.currentUser!!))
+                        adapter.add(
+                            ChatFromItem(
+                                chatMessage,
+                                MainActivity.currentUser!!
+                            )
+                        )
                         if (chatMessage.messageType != "text")
                             freezeGui(false)
 
@@ -491,7 +518,9 @@ class ChatLogActivity : AppCompatActivity() {
         when (item?.itemId) {
             R.id.menu_group_info -> {
                 val intent = Intent(this, GroupInfoActivity::class.java)
-                intent.putExtra("GROUP_INFO", toGroup)
+                intent.putExtra("GROUP_INFO",
+                    toGroup
+                )
                 startActivity(intent)
             }
         }

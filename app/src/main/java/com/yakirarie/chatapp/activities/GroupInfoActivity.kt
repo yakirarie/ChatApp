@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +11,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.auth.FirebaseAuth
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import com.yakirarie.chatapp.dialogs.DeleteGroupDialog
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.adaptersItems.UserItemGroupInfo
 import kotlinx.android.synthetic.main.activity_group_info.*
 
 
@@ -48,7 +52,12 @@ class GroupInfoActivity : AppCompatActivity() {
         group.usersList.remove(admin)
         group.usersList.add(0, admin!!)
         group.usersList.forEach {
-            adapter.add(UserItemGroupInfo(it, group.groupAdminUID))
+            adapter.add(
+                UserItemGroupInfo(
+                    it,
+                    group.groupAdminUID
+                )
+            )
         }
     }
 
@@ -65,7 +74,8 @@ class GroupInfoActivity : AppCompatActivity() {
             R.id.menu_group_delete -> {
                 val bundle = Bundle()
                 bundle.putParcelable("GROUP_TO_DELETE", group)
-                val customDialog = DeleteGroupDialog()
+                val customDialog =
+                    DeleteGroupDialog()
                 customDialog.arguments = bundle
                 customDialog.show(supportFragmentManager, "delete group")
             }

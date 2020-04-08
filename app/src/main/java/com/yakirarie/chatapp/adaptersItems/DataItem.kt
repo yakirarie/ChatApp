@@ -1,11 +1,14 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.adaptersItems
 
 import android.content.Intent
-import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import com.yakirarie.chatapp.activities.FullScreenMediaActivity
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.classObjects.User
 import kotlinx.android.synthetic.main.user_row_message.view.*
 
 class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
@@ -24,7 +27,7 @@ class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
                 ).into(viewHolder.itemView.imageViewNewMessage)
 
             viewHolder.itemView.imageViewNewMessage.setOnClickListener {
-                val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
+                val intent = Intent(viewHolder.itemView.context, FullScreenMediaActivity::class.java)
                 intent.putExtra("image_url", data.profileImageUrl)
                 intent.putExtra("media_type", "image")
 
@@ -41,7 +44,7 @@ class DataItem(val data: Any?) : Item<GroupieViewHolder>() {
                 ).into(viewHolder.itemView.imageViewNewMessage)
 
             viewHolder.itemView.imageViewNewMessage.setOnClickListener {
-                val intent = Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
+                val intent = Intent(viewHolder.itemView.context, FullScreenMediaActivity::class.java)
                 intent.putExtra("image_url", data.groupImageUrl)
                 intent.putExtra("media_type", "image")
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

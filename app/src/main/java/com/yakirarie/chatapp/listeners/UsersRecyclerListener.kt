@@ -5,10 +5,10 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.yakirarie.chatapp.DataItem
-import com.yakirarie.chatapp.Group
+import com.yakirarie.chatapp.adaptersItems.DataItem
+import com.yakirarie.chatapp.classObjects.Group
 import com.yakirarie.chatapp.fragments.NewMessageFragment
-import com.yakirarie.chatapp.User
+import com.yakirarie.chatapp.classObjects.User
 
 class UsersRecyclerListener {
 

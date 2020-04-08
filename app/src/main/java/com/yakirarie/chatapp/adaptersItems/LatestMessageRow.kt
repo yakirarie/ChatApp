@@ -1,7 +1,6 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.adaptersItems
 
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
@@ -13,6 +12,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import com.yakirarie.chatapp.*
+import com.yakirarie.chatapp.activities.FullScreenMediaActivity
+import com.yakirarie.chatapp.classObjects.ChatMessage
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.classObjects.User
 import kotlinx.android.synthetic.main.latest_message_row.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -66,7 +70,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
 
                     viewHolder.itemView.imageViewLatestProfile.setOnClickListener {
                         val intent =
-                            Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
+                            Intent(viewHolder.itemView.context, FullScreenMediaActivity::class.java)
                         intent.putExtra("image_url", group?.groupImageUrl)
                         intent.putExtra("media_type", "image")
 
@@ -105,7 +109,7 @@ class LatestMessageRow(val chatMessage: ChatMessage, val groupId: String? = null
 
                     viewHolder.itemView.imageViewLatestProfile.setOnClickListener {
                         val intent =
-                            Intent(viewHolder.itemView.context, FullScreenMedia::class.java)
+                            Intent(viewHolder.itemView.context, FullScreenMediaActivity::class.java)
                         intent.putExtra("image_url", chatPartnerUser?.profileImageUrl)
                         intent.putExtra("media_type", "image")
 

@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.dialogs.SignOutDialog
+import com.yakirarie.chatapp.classObjects.User
 import com.yakirarie.chatapp.fragments.HomeFragment
 import com.yakirarie.chatapp.fragments.MyProfileFragment
 import com.yakirarie.chatapp.fragments.NewMessageFragment
@@ -119,7 +123,9 @@ class MainActivity : AppCompatActivity() {
 
         if (toUser != null) {  // my notification
             if (currentUser == null)
-                currentUser = intent.getParcelableExtra(CURRENT_USER)
+                currentUser = intent.getParcelableExtra(
+                    CURRENT_USER
+                )
 
             val intent = Intent(this, ChatLogActivity::class.java)
 
@@ -170,10 +176,21 @@ class MainActivity : AppCompatActivity() {
                 val receiverToken = intent.getStringExtra("receiver_token")
 
                 if (receiverId != null && receiverUsername != null && receiverImg != null && receiverToken != null)
-                    currentUser = User(receiverId, receiverUsername, receiverImg, receiverToken)
+                    currentUser =
+                        User(
+                            receiverId,
+                            receiverUsername,
+                            receiverImg,
+                            receiverToken
+                        )
 
                 if (senderId != null && senderUsername != null && senderImg != null && senderToken != null) {
-                    val user = User(senderId, senderUsername, senderImg, senderToken)
+                    val user = User(
+                        senderId,
+                        senderUsername,
+                        senderImg,
+                        senderToken
+                    )
 
                     val intent = Intent(this, ChatLogActivity::class.java)
                     intent.putExtra(NewMessageFragment.USER_KEY, user)
@@ -194,7 +211,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                currentUser = p0.getValue(User::class.java)
+                currentUser = p0.getValue(
+                    User::class.java)
                 supportActionBar?.title = currentUser?.username
                 Log.d(TAG, "current user is ${currentUser?.username}")
                 checkIfTokenHasChanged()
@@ -219,7 +237,8 @@ class MainActivity : AppCompatActivity() {
         when (item?.itemId) {
 
             R.id.menu_sign_out -> {
-                SignOutDialog().show(supportFragmentManager, "sign_out")
+                SignOutDialog()
+                    .show(supportFragmentManager, "sign_out")
             }
 
             R.id.menu_create_group -> {
@@ -232,7 +251,10 @@ class MainActivity : AppCompatActivity() {
                     return false
                 }
                 val intent = Intent(this, ChooseUserForGroupActivity::class.java)
-                intent.putExtra(CURRENT_USER, currentUser)
+                intent.putExtra(
+                    CURRENT_USER,
+                    currentUser
+                )
                 startActivity(intent)
             }
         }

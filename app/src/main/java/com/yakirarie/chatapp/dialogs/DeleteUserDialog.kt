@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.dialogs
 
 import android.content.Intent
 import android.graphics.Color
@@ -13,6 +13,9 @@ import androidx.fragment.app.DialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import com.yakirarie.chatapp.R
+import com.yakirarie.chatapp.activities.LoginActivity
+import com.yakirarie.chatapp.classObjects.User
 import kotlinx.android.synthetic.main.delete_user_dialog.*
 
 class DeleteUserDialog : DialogFragment() {

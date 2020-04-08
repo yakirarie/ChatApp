@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.classObjects
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

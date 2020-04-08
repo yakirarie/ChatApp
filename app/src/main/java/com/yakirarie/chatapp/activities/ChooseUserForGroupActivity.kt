@@ -1,10 +1,9 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.activities
 
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -18,6 +17,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import com.yakirarie.chatapp.*
+import com.yakirarie.chatapp.adaptersItems.UserItemCreateGroup
+import com.yakirarie.chatapp.classObjects.Group
+import com.yakirarie.chatapp.classObjects.User
 import kotlinx.android.synthetic.main.activity_choose_users_for_group.*
 import java.util.*
 
@@ -32,7 +35,9 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choose_users_for_group)
-        val currentUser = intent.getParcelableExtra<User>(MainActivity.CURRENT_USER)
+        val currentUser = intent.getParcelableExtra<User>(
+            MainActivity.CURRENT_USER
+        )
         val currentGroup = intent.getParcelableExtra<Group>("GROUP_INFO")
 
         supportActionBar?.title = if (currentGroup == null) "Create Group" else "Edit Group"
@@ -100,8 +105,18 @@ class ChooseUserForGroupActivity : AppCompatActivity(), SearchView.OnQueryTextLi
         adapter.clear()
         usersList.clear()
         usersMap.values.forEach {
-            adapter.add(UserItemCreateGroup(it, chosenUsersIds))
-            usersList.add(UserItemCreateGroup(it, chosenUsersIds))
+            adapter.add(
+                UserItemCreateGroup(
+                    it,
+                    chosenUsersIds
+                )
+            )
+            usersList.add(
+                UserItemCreateGroup(
+                    it,
+                    chosenUsersIds
+                )
+            )
         }
     }
 

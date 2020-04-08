@@ -5,9 +5,9 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.yakirarie.chatapp.ChatMessage
+import com.yakirarie.chatapp.classObjects.ChatMessage
 import com.yakirarie.chatapp.fragments.HomeFragment
-import com.yakirarie.chatapp.LatestMessageRow
+import com.yakirarie.chatapp.adaptersItems.LatestMessageRow
 
 class LatestMessagesRecyclerListener {
     val latestMessagesMap = HashMap<String, ChatMessage>()
