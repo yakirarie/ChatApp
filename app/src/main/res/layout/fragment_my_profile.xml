@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MyProfileActivity">
+    android:layout_height="match_parent">
 
     <Button
         android:id="@+id/createUserBtn"
@@ -14,7 +13,6 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="4dp"
         android:background="@drawable/rounded_button"
-        android:onClick="saveChangesClicked"
         android:text="Save Changes"
         android:textColor="#29323c"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,7 +40,6 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="24dp"
-        android:onClick="viewImageFullScreen"
         app:civ_border_width="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -57,7 +54,6 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         android:background="@drawable/rounded_button"
-        android:onClick="changePhotoClicked"
         android:text="Change Photo"
         android:textColor="#29323c"
         app:layout_constraintEnd_toEndOf="parent"
@@ -73,7 +69,6 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         android:background="@drawable/rounded_delete"
-        android:onClick="deleteAccountClicked"
         android:text="Delete Account"
         android:textColor="#29323c"
         app:layout_constraintEnd_toEndOf="parent"

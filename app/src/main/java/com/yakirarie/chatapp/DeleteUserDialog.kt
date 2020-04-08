@@ -1,5 +1,6 @@
 package com.yakirarie.chatapp
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -174,12 +175,13 @@ class DeleteUserDialog : DialogFragment() {
                 .show()
             freezeGui(false)
             dialog?.dismiss()
-            activity?.finish()
+            val intent = Intent(view!!.context, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
         }?.addOnFailureListener {
             FirebaseAuth.getInstance().signOut()
             freezeGui(false)
             dialog?.dismiss()
-            activity?.finish()
             Log.e(TAG, "Failed to delete authentication")
         }
 

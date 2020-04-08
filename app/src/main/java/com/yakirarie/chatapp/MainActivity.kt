@@ -7,12 +7,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
-import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.GroupieViewHolder
+import com.yakirarie.chatapp.fragments.HomeFragment
+import com.yakirarie.chatapp.fragments.MyProfileFragment
+import com.yakirarie.chatapp.fragments.NewMessageFragment
+import com.yakirarie.chatapp.listeners.LatestMessagesRecyclerListener
+import com.yakirarie.chatapp.listeners.UsersRecyclerListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -23,53 +25,51 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var currentUser: User? = null
         val CURRENT_USER = "CURRENT_USER"
-
     }
-
-
-    val adapter = GroupAdapter<GroupieViewHolder>()
-    val latestMessagesMap = HashMap<String, ChatMessage>()
-    lateinit var listener: ChildEventListener
+    private val usersRecyclerListener =
+        UsersRecyclerListener()
+    private val latestMessagesRecyclerListener =
+        LatestMessagesRecyclerListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.title = ""
-        recyclerViewLatestMessages.adapter = adapter
-        recyclerViewLatestMessages.addItemDecoration(
-            DividerItemDecoration(
-                this,
-                DividerItemDecoration.VERTICAL
-            )
-        )
-        adapter.setOnItemClickListener { item, view ->
-            val intent = Intent(this, ChatLogActivity::class.java)
-            val row = item as LatestMessageRow
-            if (!row.enableClick) return@setOnItemClickListener
-            if (row.chatMessage.toId.size == 1) { // user to user msg
-                if (row.chatPartnerUser == null)
-                    if (row.chatMessage.fromId == FirebaseAuth.getInstance().uid)
-                        removeDeletedUserInteractionsWithYou(row.chatMessage.toId[0])
-                    else
-                        removeDeletedUserInteractionsWithYou(row.chatMessage.fromId)
-                else {
-                    intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
-                    startActivity(intent)
-                }
-            } else { // group msg
-                if (row.group == null)
-                    removeDeletedGroupInteractionsWithYou(row.groupId!!)
-                else {
-                    intent.putExtra(NewMessageActivity.GROUP_KEY, row.group)
-                    startActivity(intent)
-                }
-            }
 
-        }
         verifyUserLoggedIn()
         fetchCurrentUser()
+        usersRecyclerListener.fetchUsers()
         receivedNotification()
-
+        supportFragmentManager.beginTransaction()
+            .replace(frameLayoutMainActivity.id,
+                HomeFragment()
+            ).commit()
+        bottomNavigationView.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.menu_home -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(frameLayoutMainActivity.id,
+                            HomeFragment()
+                        ).commit()
+                    true
+                }
+                R.id.menu_user_profile -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(frameLayoutMainActivity.id,
+                            MyProfileFragment()
+                        ).commit()
+                    true
+                }
+                R.id.menu_new_message -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(frameLayoutMainActivity.id,
+                            NewMessageFragment()
+                        ).commit()
+                    true
+                }
+                else -> false
+            }
+        }
 
     }
 
@@ -77,58 +77,16 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         verifyUserLoggedIn()
         fetchCurrentUser()
-        listenForLatestMessages()
-
+        usersRecyclerListener.fetchUsers()
+        latestMessagesRecyclerListener.listenForLatestMessages()
 
     }
 
     override fun onStop() {
         super.onStop()
-        FirebaseDatabase.getInstance()
-            .getReference("/latest-messages/${FirebaseAuth.getInstance().uid}")
-            .removeEventListener(listener)
-    }
+        latestMessagesRecyclerListener.clearAdapter()
+        usersRecyclerListener.clearAdapter()
 
-    private fun removeDeletedUserInteractionsWithYou(deletedId: String) {
-        Toast.makeText(this, "This user no longer exists", Toast.LENGTH_SHORT).show()
-        val uid = FirebaseAuth.getInstance().uid
-        val refLatest =
-            FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
-        refLatest.removeValue().addOnSuccessListener {
-            Log.d(TAG, "user $deletedId deleted from your latest messages")
-
-        }.addOnFailureListener {
-
-            Log.e(TAG, "Failed to delete latest-messages with deleted : ${it.message}")
-
-        }
-
-        val refMessages =
-            FirebaseDatabase.getInstance().getReference("user-messages/$uid/$deletedId")
-        refMessages.removeValue().addOnSuccessListener {
-            Log.d(TAG, "user $deletedId deleted from your messages")
-
-        }.addOnFailureListener {
-            Log.e(TAG, "Failed to delete user-messages with deleted : ${it.message}")
-
-        }
-
-
-    }
-
-    private fun removeDeletedGroupInteractionsWithYou(deletedId: String) {
-        Toast.makeText(this, "This group no longer exists", Toast.LENGTH_SHORT).show()
-        val uid = FirebaseAuth.getInstance().uid
-        val refLatest =
-            FirebaseDatabase.getInstance().getReference("latest-messages/$uid/$deletedId")
-        refLatest.removeValue().addOnSuccessListener {
-            Log.d(TAG, "group $deletedId deleted from your latest messages")
-
-        }.addOnFailureListener {
-
-            Log.e(TAG, "Failed to delete latest-messages with group : ${it.message}")
-
-        }
     }
 
     private fun checkIfTokenHasChanged() {
@@ -156,8 +114,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun receivedNotification() {
-        val toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-        val toGroup = intent.getParcelableExtra<Group>(NewMessageActivity.GROUP_KEY)
+        val toUser = intent.getParcelableExtra<User>(NewMessageFragment.USER_KEY)
+        val toGroup = intent.getParcelableExtra<Group>(NewMessageFragment.GROUP_KEY)
 
         if (toUser != null) {  // my notification
             if (currentUser == null)
@@ -166,10 +124,9 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, ChatLogActivity::class.java)
 
             if (toGroup != null) // group
-                intent.putExtra(NewMessageActivity.GROUP_KEY, toGroup)
+                intent.putExtra(NewMessageFragment.GROUP_KEY, toGroup)
             else  //user
-                intent.putExtra(NewMessageActivity.USER_KEY, toUser)
-
+                NewMessageFragment
 
             startActivity(intent)
 
@@ -203,7 +160,7 @@ class MainActivity : AppCompatActivity() {
                     usersList
                 )
                 val intent = Intent(this, ChatLogActivity::class.java)
-                intent.putExtra(NewMessageActivity.GROUP_KEY, group)
+                intent.putExtra(NewMessageFragment.GROUP_KEY, group)
                 startActivity(intent)
 
             } else { // user to user msg
@@ -219,7 +176,7 @@ class MainActivity : AppCompatActivity() {
                     val user = User(senderId, senderUsername, senderImg, senderToken)
 
                     val intent = Intent(this, ChatLogActivity::class.java)
-                    intent.putExtra(NewMessageActivity.USER_KEY, user)
+                    intent.putExtra(NewMessageFragment.USER_KEY, user)
                     startActivity(intent)
                 }
             }
@@ -228,57 +185,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun listenForLatestMessages() {
-        val fromId = FirebaseAuth.getInstance().uid ?: ""
-        val ref = FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId")
-        listener = (object : ChildEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-            }
-
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-            }
-
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
-                latestMessagesMap[p0.key!!] = chatMessage
-                refreshRecyclerViewMessages()
-            }
-
-            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
-                latestMessagesMap[p0.key!!] = chatMessage
-
-                refreshRecyclerViewMessages()
-
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot) {
-                latestMessagesMap.remove(p0.key!!)
-                refreshRecyclerViewMessages()
-
-            }
-
-        })
-        ref.addChildEventListener(listener)
-    }
-
-    private fun refreshRecyclerViewMessages() {
-        adapter.clear()
-        latestMessagesMap.values.forEach {
-            if (it.toId.size > 1) {
-                adapter.add(
-                    LatestMessageRow(
-                        it,
-                        latestMessagesMap.filterValues { chatMessage -> it.id == chatMessage.id }.keys.elementAt(
-                            0
-                        )
-                    )
-                )
-            } else
-                adapter.add(LatestMessageRow(it))
-
-        }
-    }
 
     private fun fetchCurrentUser() {
         val uid = FirebaseAuth.getInstance().uid
@@ -299,6 +205,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     private fun verifyUserLoggedIn() {
         val uid = FirebaseAuth.getInstance().uid
         if (uid == null) {
@@ -310,17 +217,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.menu_new_message -> {
-                val intent = Intent(this, NewMessageActivity::class.java)
-                startActivity(intent)
-            }
+
             R.id.menu_sign_out -> {
                 SignOutDialog().show(supportFragmentManager, "sign_out")
             }
-            R.id.menu_user_profile -> {
-                val intent = Intent(this, MyProfileActivity::class.java)
-                startActivity(intent)
-            }
+
             R.id.menu_create_group -> {
                 if (currentUser == null) {
                     Toast.makeText(

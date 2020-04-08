@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.yakirarie.chatapp.fragments.NewMessageFragment
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -119,14 +120,14 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
         val resultIntent = Intent(this, MainActivity::class.java)
         resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        resultIntent.putExtra(NewMessageActivity.USER_KEY, senderUser)
+        resultIntent.putExtra(NewMessageFragment.USER_KEY, senderUser)
         if (currentUser != null)
             resultIntent.putExtra(MainActivity.CURRENT_USER, currentUser)
         else if (group != null) {
             resultIntent.putExtra(
                 MainActivity.CURRENT_USER,
                 group!!.usersList.find { it.uid == FirebaseAuth.getInstance().uid })
-            resultIntent.putExtra(NewMessageActivity.GROUP_KEY, group)
+            resultIntent.putExtra(NewMessageFragment.GROUP_KEY, group)
         }
         val resultPendingIntent =
             PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)

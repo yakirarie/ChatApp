@@ -2,18 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-
-    <item
-        android:id="@+id/menu_new_message"
-        android:icon="@drawable/ic_new_message"
-        android:title="New Message"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/menu_user_profile"
-        android:icon="@drawable/ic_user_profile"
-        android:title="User Profile"
-        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_create_group"
         android:icon="@drawable/ic_group_icon"

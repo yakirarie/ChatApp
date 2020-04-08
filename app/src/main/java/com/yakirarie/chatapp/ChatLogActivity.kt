@@ -21,6 +21,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import com.yakirarie.chatapp.fragments.NewMessageFragment
 import kotlinx.android.synthetic.main.activity_chat_log.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,8 +53,8 @@ class ChatLogActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chat_log)
         initPlayer()
         recyclerViewChatLog.adapter = adapter
-        toUser = intent.getParcelableExtra(NewMessageActivity.USER_KEY)
-        toGroup = intent.getParcelableExtra(NewMessageActivity.GROUP_KEY)
+        toUser = intent.getParcelableExtra(NewMessageFragment.USER_KEY)
+        toGroup = intent.getParcelableExtra(NewMessageFragment.GROUP_KEY)
         if (toUser != null)
             supportActionBar?.title = toUser!!.username
         else if (toGroup != null)

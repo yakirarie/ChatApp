@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_home"
+        android:icon="@drawable/ic_home_icon"
+        android:title="Home"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_new_message"
+        android:icon="@drawable/ic_new_message"
+        android:title="New Message"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_user_profile"
+        android:icon="@drawable/ic_user_profile"
+        android:title="User Profile"
+        app:showAsAction="ifRoom" />
+
+</menu>
