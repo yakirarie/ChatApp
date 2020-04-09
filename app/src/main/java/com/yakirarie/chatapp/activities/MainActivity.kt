@@ -132,8 +132,7 @@ class MainActivity : AppCompatActivity() {
             if (toGroup != null) // group
                 intent.putExtra(NewMessageFragment.GROUP_KEY, toGroup)
             else  //user
-                NewMessageFragment
-
+                intent.putExtra(NewMessageFragment.USER_KEY, toUser)
             startActivity(intent)
 
         } else { // firebase notification

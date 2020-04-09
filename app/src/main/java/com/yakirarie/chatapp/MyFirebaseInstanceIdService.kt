@@ -105,19 +105,19 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
         Log.d("CN", currentActivity)
 
 
-        if (currentActivity == ".ChatLogActivity") {
+        if (currentActivity == ".activities.ChatLogActivity") {
             if (currentUser != null) { // user to user
-                if (ChatLogActivity.toUser != null) { // you are in a user chat
-                    if (senderUser!!.uid == ChatLogActivity.toUser!!.uid) { // you are in the same chat
+                if (ChatLogActivity.toUser != null)  // you are in a user chat
+                    if (senderUser!!.uid == ChatLogActivity.toUser!!.uid)  // you are in the same chat
                         return
-                    }
-                }
-            } else if (group != null) { // user to group
+
+
+            } else if (group != null) // user to group
                 if (ChatLogActivity.toGroup != null) //you are in a group chat
-                    if (group!!.uid == ChatLogActivity.toGroup!!.uid) { // you are in the same group chat
+                    if (group!!.uid == ChatLogActivity.toGroup!!.uid)  // you are in the same group chat
                         return
-                    }
-            }
+
+
         }
 
 
