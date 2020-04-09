@@ -42,12 +42,13 @@ class MainActivity : AppCompatActivity() {
 
         verifyUserLoggedIn()
         fetchCurrentUser()
-        usersRecyclerListener.fetchUsers()
         receivedNotification()
+
         supportFragmentManager.beginTransaction()
             .replace(frameLayoutMainActivity.id,
                 HomeFragment()
             ).commit()
+
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.menu_home -> {

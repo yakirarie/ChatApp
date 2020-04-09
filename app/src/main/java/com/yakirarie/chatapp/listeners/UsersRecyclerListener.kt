@@ -13,11 +13,11 @@ import com.yakirarie.chatapp.classObjects.User
 class UsersRecyclerListener {
 
     val usersMap = HashMap<String, Any>()
-    val usersList = mutableListOf<DataItem>()
+    lateinit var listener: ChildEventListener
 
     fun fetchUsers() {
         val ref = FirebaseDatabase.getInstance().getReference("users")
-        ref.addChildEventListener(object : ChildEventListener {
+        listener = (object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {
             }
 
@@ -66,21 +66,23 @@ class UsersRecyclerListener {
         }
 
 
-        )
+                )
+        ref.addChildEventListener(listener)
 
 
     }
+
     private fun refreshRecyclerUsers() {
         NewMessageFragment.adapter.clear()
-        usersList.clear()
         usersMap.values.forEach {
             NewMessageFragment.adapter.add(
                 DataItem(it)
             )
-            usersList.add(DataItem(it))
         }
     }
-    fun clearAdapter(){
+
+    fun clearAdapter() {
+        FirebaseDatabase.getInstance().getReference("users").removeEventListener(listener)
         NewMessageFragment.adapter.clear()
     }
 }

@@ -98,12 +98,8 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             channel.canBypassDnd()
         }
 
-        val am =
-            this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val cn = am.appTasks[0].taskInfo.topActivity
-        val currentActivity = cn?.shortClassName ?: "none"
+        val currentActivity = getCurrentActivity()
         Log.d("CN", currentActivity)
-
 
         if (currentActivity == ".activities.ChatLogActivity") {
             if (currentUser != null) { // user to user
@@ -169,6 +165,13 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             e.printStackTrace()
             null
         }
+    }
+
+    private fun getCurrentActivity(): String {
+        val am =
+            this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val cn = am.appTasks[0].taskInfo.topActivity
+        return cn?.shortClassName ?: "none"
     }
 
 }
