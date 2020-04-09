@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
@@ -28,12 +29,36 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var currentUser: User? = null
-        val CURRENT_USER = "CURRENT_USER"
+        const val CURRENT_USER = "CURRENT_USER"
     }
+
     private val usersRecyclerListener =
         UsersRecyclerListener()
     private val latestMessagesRecyclerListener =
         LatestMessagesRecyclerListener()
+
+    private var activeFragmentInd = 0
+
+    private val fragments = listOf(HomeFragment(), NewMessageFragment(), MyProfileFragment())
+
+    private fun changeFragments(chosenFragmentInd: Int): Boolean {
+        if (chosenFragmentInd != activeFragmentInd) {
+            val animations = getFragmentAnim(chosenFragmentInd)
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(animations[0], animations[1])
+                .replace(frameLayoutMainActivity.id, fragments[chosenFragmentInd]).commit()
+            activeFragmentInd = chosenFragmentInd
+            return true
+        }
+        return false
+    }
+
+    private fun getFragmentAnim(chosenFragmentInd: Int): List<Int> {
+        return if (chosenFragmentInd < activeFragmentInd)
+            listOf(R.anim.enter_from_right, R.anim.exit_to_left)
+        else
+            listOf(R.anim.enter_from_left, R.anim.exit_to_right)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,33 +70,23 @@ class MainActivity : AppCompatActivity() {
         receivedNotification()
 
         supportFragmentManager.beginTransaction()
-            .replace(frameLayoutMainActivity.id,
+            .replace(
+                frameLayoutMainActivity.id,
                 HomeFragment()
             ).commit()
 
         bottomNavigationView.setOnNavigationItemSelectedListener {
+
             when (it.itemId) {
-                R.id.menu_home -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(frameLayoutMainActivity.id,
-                            HomeFragment()
-                        ).commit()
-                    true
-                }
-                R.id.menu_user_profile -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(frameLayoutMainActivity.id,
-                            MyProfileFragment()
-                        ).commit()
-                    true
-                }
-                R.id.menu_new_message -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(frameLayoutMainActivity.id,
-                            NewMessageFragment()
-                        ).commit()
-                    true
-                }
+                R.id.menu_home ->
+                    changeFragments(0)
+
+                R.id.menu_new_message ->
+                    changeFragments(1)
+
+                R.id.menu_user_profile ->
+                    changeFragments(2)
+
                 else -> false
             }
         }
@@ -212,7 +227,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onDataChange(p0: DataSnapshot) {
                 currentUser = p0.getValue(
-                    User::class.java)
+                    User::class.java
+                )
                 supportActionBar?.title = currentUser?.username
                 Log.d(TAG, "current user is ${currentUser?.username}")
                 checkIfTokenHasChanged()
