@@ -11,11 +11,11 @@
     </style>
 
     <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:fontFamily">@font/cabin</item>
     </style>
 
     <style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/cabin_bold</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
