@@ -47,7 +47,7 @@
             <Button
                 android:id="@+id/sign_out_btn_no"
                 android:layout_width="60dp"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:clickable="true"
                 android:focusable="true"
@@ -57,7 +57,7 @@
             <Button
                 android:id="@+id/sign_out_btn_yes"
                 android:layout_width="60dp"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="50dp"
                 android:background="@drawable/rounded_button"
                 android:clickable="true"
