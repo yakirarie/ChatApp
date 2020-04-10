@@ -41,25 +41,6 @@ class MainActivity : AppCompatActivity() {
 
     private val fragments = listOf(HomeFragment(), NewMessageFragment(), MyProfileFragment())
 
-    private fun changeFragments(chosenFragmentInd: Int): Boolean {
-        if (chosenFragmentInd != activeFragmentInd) {
-            val animations = getFragmentAnim(chosenFragmentInd)
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(animations[0], animations[1])
-                .replace(frameLayoutMainActivity.id, fragments[chosenFragmentInd]).commit()
-            activeFragmentInd = chosenFragmentInd
-            return true
-        }
-        return false
-    }
-
-    private fun getFragmentAnim(chosenFragmentInd: Int): List<Int> {
-        return if (chosenFragmentInd < activeFragmentInd)
-            listOf(R.anim.enter_from_right, R.anim.exit_to_left)
-        else
-            listOf(R.anim.enter_from_left, R.anim.exit_to_right)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -69,11 +50,14 @@ class MainActivity : AppCompatActivity() {
         fetchCurrentUser()
         receivedNotification()
 
+
         supportFragmentManager.beginTransaction()
             .replace(
                 frameLayoutMainActivity.id,
                 HomeFragment()
             ).commit()
+
+
 
         bottomNavigationView.setOnNavigationItemSelectedListener {
 
@@ -91,6 +75,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun changeFragments(chosenFragmentInd: Int): Boolean {
+        if (chosenFragmentInd != activeFragmentInd) {
+            val animations = getFragmentAnim(chosenFragmentInd)
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(animations[0], animations[1])
+                .replace(frameLayoutMainActivity.id, fragments[chosenFragmentInd]).commit()
+            activeFragmentInd = chosenFragmentInd
+            return true
+        }
+        return false
+    }
+
+    private fun getFragmentAnim(chosenFragmentInd: Int): List<Int> {
+        return if (chosenFragmentInd < activeFragmentInd)
+            listOf(R.anim.enter_from_right, R.anim.exit_to_left)
+        else
+            listOf(R.anim.enter_from_left, R.anim.exit_to_right)
     }
 
     override fun onStart() {
@@ -282,4 +285,5 @@ class MainActivity : AppCompatActivity() {
 
         return super.onCreateOptionsMenu(menu)
     }
+
 }

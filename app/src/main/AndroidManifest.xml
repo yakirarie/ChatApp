@@ -28,7 +28,8 @@
         <activity android:name=".activities.LoginActivity" />
         <activity
             android:name=".activities.MainActivity"
-            android:windowSoftInputMode="adjustNothing">
+            android:windowSoftInputMode="adjustNothing"
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
