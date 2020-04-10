@@ -18,7 +18,7 @@
             <item android:right="3dp" android:top="3dp">
                 <shape>
                     <corners android:radius="20dp" />
-                    <solid android:color="#036150" />
+                    <solid android:color="#596164" />
                 </shape>
             </item>
             <item android:bottom="2dp" android:left="2dp">
