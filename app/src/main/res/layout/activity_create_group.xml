@@ -88,14 +88,4 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-    <ProgressBar
-        android:id="@+id/progressBarCreateGroup"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/recyclerViewCreateGroup"
-        app:layout_constraintEnd_toEndOf="@+id/recyclerViewCreateGroup"
-        app:layout_constraintStart_toStartOf="@+id/recyclerViewCreateGroup"
-        app:layout_constraintTop_toTopOf="@+id/recyclerViewCreateGroup" />
 </androidx.constraintlayout.widget.ConstraintLayout>
