@@ -6,7 +6,7 @@ import com.yakirarie.chatapp.fragments.SliderFragment
 
 class SliderAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
     private val slidesImages =
-        listOf(R.drawable.profiledefault, R.drawable.group_slider, R.drawable.chat_slider)
+        listOf(R.drawable.logo_slider, R.drawable.group_slider, R.drawable.chat_slider)
     private val slidesHeads = listOf("ABOUT", "CHAT", "ALL SET")
     private val slidesDesc = listOf(
         "Enjoy this newly chat application created by Yakir Arie",

@@ -60,7 +60,7 @@
         android:layout_marginBottom="4dp"
         android:background="@drawable/rounded_button"
         android:onClick="sendImageClicked"
-        android:padding="3dp"
+        android:padding="6dp"
         app:layout_constraintBottom_toTopOf="@+id/sendBtnChatLog"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_menu_gallery" />
@@ -83,7 +83,7 @@
         android:layout_marginBottom="4dp"
         android:background="@drawable/rounded_button"
         android:onClick="openCameraClicked"
-        android:padding="3dp"
+        android:padding="6dp"
         app:layout_constraintBottom_toTopOf="@+id/sendBtnChatLog"
         app:layout_constraintEnd_toStartOf="@+id/pickImageChatLog"
         app:layout_constraintHorizontal_bias="1.0"
