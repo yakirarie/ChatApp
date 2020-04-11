@@ -7,9 +7,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
+import com.yakirarie.chatapp.viewPagerAdapters.HomeAdapter
 import com.yakirarie.chatapp.classObjects.Group
 import com.yakirarie.chatapp.R
 import com.yakirarie.chatapp.dialogs.SignOutDialog
@@ -36,8 +38,6 @@ class MainActivity : AppCompatActivity() {
     private val latestMessagesRecyclerListener =
         LatestMessagesRecyclerListener()
 
-    private var activeFragmentInd = 0
-
     private val fragments = listOf(HomeFragment(), NewMessageFragment(), MyProfileFragment())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,50 +49,44 @@ class MainActivity : AppCompatActivity() {
         fetchCurrentUser()
         receivedNotification()
 
-
-        supportFragmentManager.beginTransaction()
-            .replace(
-                frameLayoutMainActivity.id,
-                HomeFragment()
-            ).commit()
-
+        val adapter =
+            HomeAdapter(this, fragments)
+        mainActivityViewPager.adapter = adapter
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener {
 
             when (it.itemId) {
-                R.id.menu_home ->
-                    changeFragments(0)
-
-                R.id.menu_new_message ->
-                    changeFragments(1)
-
-                R.id.menu_user_profile ->
-                    changeFragments(2)
+                R.id.menu_home -> {
+                    mainActivityViewPager.currentItem = 0
+                    true
+                }
+                R.id.menu_new_message -> {
+                    mainActivityViewPager.currentItem = 1
+                    true
+                }
+                R.id.menu_user_profile -> {
+                    mainActivityViewPager.currentItem = 2
+                    true
+                }
 
                 else -> false
             }
         }
+        mainActivityViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 
-    }
+            override fun onPageSelected(position: Int) {
+                when(position){
+                    0 -> bottomNavigationView.selectedItemId = R.id.menu_home
+                    1 -> bottomNavigationView.selectedItemId = R.id.menu_new_message
+                    2 -> bottomNavigationView.selectedItemId = R.id.menu_user_profile
+                }
 
-    private fun changeFragments(chosenFragmentInd: Int): Boolean {
-        if (chosenFragmentInd != activeFragmentInd) {
-            val animations = getFragmentAnim(chosenFragmentInd)
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(animations[0], animations[1])
-                .replace(frameLayoutMainActivity.id, fragments[chosenFragmentInd]).commit()
-            activeFragmentInd = chosenFragmentInd
-            return true
-        }
-        return false
-    }
 
-    private fun getFragmentAnim(chosenFragmentInd: Int): List<Int> {
-        return if (chosenFragmentInd < activeFragmentInd)
-            listOf(R.anim.enter_from_right, R.anim.exit_to_left)
-        else
-            listOf(R.anim.enter_from_left, R.anim.exit_to_right)
+            }
+
+        })
+
     }
 
     override fun onStart() {

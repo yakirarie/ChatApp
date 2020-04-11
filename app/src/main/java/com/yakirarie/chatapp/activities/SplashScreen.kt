@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.yakirarie.chatapp.R
-import com.yakirarie.chatapp.SliderAdapter
+import com.yakirarie.chatapp.viewPagerAdapters.SliderAdapter
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 
 class SplashScreen : FragmentActivity() {

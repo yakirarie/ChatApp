@@ -1,4 +1,4 @@
-package com.yakirarie.chatapp
+package com.yakirarie.chatapp.services
 
 
 import android.app.*
@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.yakirarie.chatapp.R
 import com.yakirarie.chatapp.activities.ChatLogActivity
 import com.yakirarie.chatapp.activities.MainActivity
 import com.yakirarie.chatapp.classObjects.Group
@@ -120,14 +121,20 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
         val resultIntent = Intent(this, MainActivity::class.java)
         resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        resultIntent.putExtra(NewMessageFragment.USER_KEY, senderUser)
+        resultIntent.putExtra(NewMessageFragment.USER_KEY,
+            senderUser
+        )
         if (currentUser != null)
-            resultIntent.putExtra(MainActivity.CURRENT_USER, currentUser)
+            resultIntent.putExtra(MainActivity.CURRENT_USER,
+                currentUser
+            )
         else if (group != null) {
             resultIntent.putExtra(
                 MainActivity.CURRENT_USER,
                 group!!.usersList.find { it.uid == FirebaseAuth.getInstance().uid })
-            resultIntent.putExtra(NewMessageFragment.GROUP_KEY, group)
+            resultIntent.putExtra(NewMessageFragment.GROUP_KEY,
+                group
+            )
         }
         val resultPendingIntent =
             PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -138,7 +145,9 @@ class MyFirebaseInstanceIdService : FirebaseMessagingService() {
             imageBitmap = getBitmapfromUrl(remoteMessage.notification?.imageUrl.toString())
 
         notificationBuilder.setAutoCancel(true)
-            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+            .setColor(ContextCompat.getColor(this,
+                R.color.colorPrimary
+            ))
             .setContentTitle(remoteMessage.notification?.title)
             .setContentText(remoteMessage.notification?.body)
             .setDefaults(Notification.DEFAULT_ALL)
