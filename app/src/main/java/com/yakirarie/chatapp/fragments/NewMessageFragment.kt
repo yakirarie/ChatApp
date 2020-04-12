@@ -40,12 +40,6 @@ class NewMessageFragment : Fragment(), SearchView.OnQueryTextListener {
         super.onViewCreated(view, savedInstanceState)
         recyclerViewNewMessage.adapter =
             adapter
-        recyclerViewNewMessage.addItemDecoration(
-            DividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL
-            )
-        )
 
         adapter.setOnItemClickListener { item, view ->
             val dataItem = item as DataItem
